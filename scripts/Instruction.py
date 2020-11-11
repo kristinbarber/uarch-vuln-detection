@@ -16,11 +16,13 @@ class Instr:
         self.CEND = "\033[0m"
  
     def __str__(self):
-        return "seq: "+str(self.seqnum)+"; pc: "+self.CGREEN+self.pc+self.CEND+"; inst: "+self.CVIOLET+self.inst+self.CEND+ \
-                "; fetch: "+str(self.fetch)+ \
-                "; decode: "+str(self.decode)+ \
-                "; rename: "+str(self.rename)+ \
-                "; dispatch: "+str(self.dispatch)+ \
-                "; issue: "+str(self.issue)+ \
-                "; complete: "+str(self.complete)+ \
-                "; retire: "+str(self.retire)
+        return "seq: " + str(self.seqnum) + \
+                "; pc: " + self.CGREEN+self.pc+self.CEND + \
+                "; inst: " + self.CVIOLET+self.inst+self.CEND + \
+                "; fetch: " + str(self.fetch) + \
+                "; decode: " + str(self.decode) + \
+                "; rename: " + str(self.rename) + \
+                "; dispatch: " + str(self.dispatch) + \
+                "; issue: " + str(self.issue) + \
+                "; complete: " + str(self.complete) + \
+                "; retire: " + str(self.retire)
