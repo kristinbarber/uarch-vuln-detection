@@ -2,14 +2,30 @@ import collections
 import enum
 import sys
 
-class Component(enum.Enum):
-    LQ = 1
-    SQ = 2
-    ROB = 3
-    LFB = 4
-    HWPREFETCHER = 5
+def find_index(lst, condition):
+    idx = None
+    for i, elem in enumerate(lst):
+         if condition(elem):
+             return i
+    return idx 
 
-# Multiset comparison
+class FunctionalUnits(enum.Enum):
+    ALU = 0
+    ADDRGEN = 1
+    DIV = 2
+    MUL = 3
+
+class Component(enum.Enum):
+    LQ = 0
+    SQ = 1
+    ROB = 2
+    LFB = 3
+    HWPREFETCHER = 4
+    EXESTATUS = 5
+    IPRF = 6
+    FPRF = 7
+
+# Counting-sort comparison
 def compareContent(x, y):
     return collections.Counter(x) == collections.Counter(y)
 
@@ -51,13 +67,19 @@ class UArch:
         self.rob = ROB()
         self.lfb = LineFillBuffer()
         self.hwprefetcher = Prefetcher()
+        self.intRegFile = RegisterFile('IntPRF')
+        self.fpRegFile = RegisterFile('FpPRF')
+        self.executionUnitsBusy = ExecutionUnitsStatus()
 
     def __eq__(self, state):
         return self.lq == state.lq and \
                self.sq == state.sq and \
                self.rob == state.rob and \
                self.lfb == state.lfb and \
-               self.hwprefetcher == state.hwprefetcher
+               self.hwprefetcher == state.hwprefetcher and \
+               self.intRegFile == state.intRegFile and \
+               self.fpRegFile == state.fpRegFile and \
+               self.executionUnitsBusy == state.executionUnitsBusy
 
     def compare(self, comptype, state):
         if comptype == Component.LQ:
@@ -70,6 +92,12 @@ class UArch:
             return self.lfb == state.lfb
         elif comptype == Component.HWPREFETCHER:
             return self.hwprefetcher == state.hwprefetcher
+        elif comptype == Component.IPRF:
+            return self.intRegFile == state.intRegFile
+        elif comptype == Component.FPRF:
+            return self.fpRegFile == state.fpRegFile
+        elif comptype == Component.EXESTATUS:
+            return self.executionUnitsBusy == state.executionUnitsBusy
         else:
             print('Unknown uarch component type, aborting...\n')
             sys.exit()
@@ -81,7 +109,10 @@ class UArch:
                str(self.lq) + '\n' + \
                str(self.sq) + '\n' + \
                str(self.lfb) + '\n' + \
-               str(self.hwprefetcher)
+               str(self.hwprefetcher) + '\n' + \
+               str(self.intRegFile) + '\n' + \
+               str(self.fpRegFile) + '\n' + \
+               str(self.executionUnitsBusy)
 
 class LoadQueue(CircularQueue):
     def __init__(self):
@@ -110,22 +141,25 @@ class StoreQueue(CircularQueue):
         self.sn = []
         self.pc = []
         self.address = []
+        self.data = []
         super(StoreQueue, self).__init__()
 
     def __eq__(self, sqOther):
        if self.occupancy == sqOther.occupancy: 
            if compareContent(self.pc, sqOther.pc): #Ordering enforced: if all(x==y for x,y in zip(self.getValidEntries(self.pc), sqOther.getValidEntries(sqOther.pc))):
                return compareContent(self.address, sqOther.address)
+                   #return compareContent(self.data, sqOther.data)
        return False
 
     def __str__(self):
-        return 'SQ: ' + str(self.sn) + '\n' + str(self.pc) + '\n' + str(self.address) 
+        return 'SQ: ' + str(self.sn) + '\n' + str(self.pc) + '\n' + str(self.address) + '\n' + str(self.data)
 
     def setmetaData(self):
         super(StoreQueue, self).setmetaData()
         self.sn = self.getValidEntries(self.sn)
         self.pc = self.getValidEntries(self.pc)
         self.address = self.getValidEntries(self.address)
+        self.data = self.getValidEntries(self.data)
 
 
 class ROB(CircularQueue):
@@ -159,7 +193,28 @@ class LineFillBuffer():
 
     def __str__(self):
         return 'LFB: ' + str(self.data)
+
+class RegisterFile():
+    def __init__(self, name):
+        self.name = name
+        self.data = []
+
+    def __eq__(self, regOther):
+        return compareContent(self.data, regOther.data)
+
+    def __str__(self):
+        return self.name + str(self.data)
            
+class ExecutionUnitsStatus():
+    def __init__(self):
+        self.reqs = [0 for x in range(len(FunctionalUnits))]
+
+    def __eq__(self, exeStatsOther):
+        return self.reqs == exeStatsOther.reqs
+
+    def __str__(self):
+        return 'ExecutionStats: ' + str(self.reqs)
+
 class Prefetcher():
     def __init__(self):
         self.data = '' 

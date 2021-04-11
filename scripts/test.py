@@ -2,8 +2,10 @@ import pickle
 import Instruction
 from Microarchitecture import *
 
-instructions, loops, stateDeltas = pickle.load(open(sys.argv[1], 'rb'))
-print(len(stateDeltas[Component.LFB]))
+instructions, loops, states = pickle.load(open(sys.argv[1], 'rb'))
+
+
+"""print(len(stateDeltas[Component.LFB]))
 
 print(loops[0][0].fetch)
 print(loops[0][-1].retire)
@@ -13,6 +15,7 @@ print(stateDeltas[Component.LFB][1].cycle_begin)
 print(stateDeltas[Component.LFB][1].cycle_end)
 
 print([loop[-1].retire-loop[0].fetch for loop in loops])
+"""
 
 #print(stateDeltas[Component.LFB][100].lfb.data)
 #testcase = UArch('fake')

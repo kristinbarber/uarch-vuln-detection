@@ -28,7 +28,7 @@ and subsequently counted across loops/iterations. Following this, there are list
 We use these counts to determine common state samples shared across loop iterations, where we may set some threshold to determine if a state should be considered common or not.
 For instance, if a particular state sample appears in 85% of all loop iterations, we consider this significant enough that it should be considered a state sample common to all iterations.
 To be clear, this process is performed seperately for iterations where k=0 and k=1.
-Once the list of common state samples has been formed, we then take the difference of these samples across the k=0/k=0 lists.
+Once the list of common state samples has been formed, we then take the difference of these samples across the k=0/k=1 lists.
 This process again is performed for every uarch structure, where what constitues uniqueness, commonality and differences are based on different criterion.
 
 time ./scripts/do_stats.sh 0xaa 0x0000024fcc 0x000001039a 0x000002509a 0x00000305b6 0x00000305d8 bearssl consttime
