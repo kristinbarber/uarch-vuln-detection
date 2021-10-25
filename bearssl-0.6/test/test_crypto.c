@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Thomas Pornin <pornin@bolet.org>
  *
- * Permission is hereby granted, free of charge, to any person obtaining 
+ * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish,
@@ -9,12 +9,12 @@
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
  *
- * The above copyright notice and this permission notice shall be 
+ * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
  * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
@@ -3198,6 +3198,30 @@ monte_carlo_AES_decrypt(const br_block_cbcdec_class *vd,
 	check_equals("MC AES decrypt", buf, plain, sizeof buf);
 }
 
+static void test_AES_big_single(char *aes_256h_key)
+{
+	  size_t u = 0;
+
+		printf("Test AES big single\n");
+		fflush(stdout);
+
+		const br_block_cbcenc_class *ve = &br_aes_big_cbcenc_vtable;
+		unsigned char key[32];
+		unsigned char plain[16];
+		unsigned char buf[16];
+		unsigned char iv[16];
+		size_t key_len;
+		br_aes_gen_cbcenc_keys v_ec;
+		const br_block_cbcenc_class **ec;
+		ec = &v_ec.vtable;
+		key_len = hextobin(key, aes_256h_key);
+		hextobin(plain, KAT_AES[u + 1]);
+		ve->init(ec, key, key_len);
+		memcpy(buf, plain, sizeof plain);
+		memset(iv, 0, sizeof iv);
+		ve->run(ec, iv, buf, sizeof buf);
+}
+
 static void
 test_AES_generic(char *name,
 	const br_block_cbcenc_class *ve,
@@ -6016,7 +6040,7 @@ test_RSA_keygen(const char *name, br_rsa_keygen kg, br_rsa_compute_modulus cm,
 	fflush(stdout);
 }
 
-static void 
+static void
 test_RSA_i15_OAEP(void)
 {
     printf("The test I've added...\n");
@@ -6042,7 +6066,7 @@ static void
 test_RSA_i31_OAEP(void)
 {
     test_RSA_OAEP("RSA i31 OAEP",
-                &br_rsa_i31_oaep_encrypt, &br_rsa_i31_oaep_decrypt);  
+                &br_rsa_i31_oaep_encrypt, &br_rsa_i31_oaep_decrypt);
 }
 
 static void
@@ -8322,7 +8346,7 @@ test_modpow_opt_i31_single(unsigned char *exp)
                         tmp1, (sizeof tmp1) / (sizeof tmp1[0]));
 
     printf(" done.\n");
-    fflush(stdout); 
+    fflush(stdout);
 }
 
 static void
@@ -8336,7 +8360,7 @@ test_modpow_i31_single(unsigned char *exp)
     br_hmac_drbg_init(&hc, &br_sha256_vtable, "seed modpow", 11);
 
     k = 100;
-    
+
     size_t blen;
     unsigned char bm[128], bx[128], bx1[128], bx2[128];
     unsigned char be[128];
@@ -8512,13 +8536,21 @@ int main(int argc, char *argv[])
 {
     int count;
     unsigned char buffer[128];
-    char *pos = argv[1];
-    for (count = 0; count < sizeof buffer/sizeof *buffer; count++) {
-        sscanf(pos, "%2hhx", &buffer[count]);
-        pos += 2;
-    }    
+		char *testname = argv[1];
+    char *pos = argv[2];
 
-    test_modpow_opt_i31_single(buffer);
-   
+		if (strcmp(testname, "modpow") == 0) {
+    	for (count = 0; count < sizeof buffer/sizeof *buffer; count++) {
+        	sscanf(pos, "%2hhx", &buffer[count]);
+        	pos += 2;
+    	}
+
+    	test_modpow_opt_i31_single(buffer);
+		}
+
+		else if (strcmp(testname, "aes_big")) {
+				test_AES_big_single(pos);
+		}
+
     return 0;
 }
