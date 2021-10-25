@@ -23,10 +23,10 @@ The first stage is to simulate the processor-under-test, executing the selected 
 #### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
 
-We have added several tests to the BearSSL unit tests suite to (1) incorporate vulnerabilities and (2) ease use with the RISC-V platform.
-The unit tests are held in the file <code>test/test_crpyto.c</code> and is compiled into the binary <code<build/testcrypto</code>. This application takes as input the testname you would like to run, as well as the secret key to be used for the given run. The key is represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (1024-bit for RSA (modpow), 128-bit for AES).
+We have added several tests to the BearSSL unit tests suite to (1) incorporate vulnerabilities and (2) ease use with the simulation platform.
+The unit tests are held in the file <code>test/test_crpyto.c</code> and is compiled into the binary <code>build/testcrypto</code>. This application takes as input the testname you would like to run, as well as the secret key to be used for the given run. The key is represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (1024-bit for RSA (modpow), 128-bit for AES).
 
-Run <code>make CONF=riscv tests</code> to compile the test binary.
+7. Run <code>make CONF=riscv tests</code> to compile the test binary.
 
 ### State Construction
 ### Metric Calculation and Statistics Reporting
