@@ -22,8 +22,8 @@ class Component(enum.Enum):
     LFB = 3
     HWPREFETCHER = 4
     EXESTATUS = 5
-    IPRF = 6
-    FPRF = 7
+#    IPRF = 6
+#    FPRF = 7
 
 # Counting-sort comparison
 def compareContent(x, y):
@@ -77,8 +77,6 @@ class UArch:
                self.rob == state.rob and \
                self.lfb == state.lfb and \
                self.hwprefetcher == state.hwprefetcher and \
-               self.intRegFile == state.intRegFile and \
-               self.fpRegFile == state.fpRegFile and \
                self.executionUnitsBusy == state.executionUnitsBusy
 
     def compare(self, comptype, state):
@@ -92,15 +90,33 @@ class UArch:
             return self.lfb == state.lfb
         elif comptype == Component.HWPREFETCHER:
             return self.hwprefetcher == state.hwprefetcher
-        elif comptype == Component.IPRF:
-            return self.intRegFile == state.intRegFile
-        elif comptype == Component.FPRF:
-            return self.fpRegFile == state.fpRegFile
         elif comptype == Component.EXESTATUS:
             return self.executionUnitsBusy == state.executionUnitsBusy
         else:
             print('Unknown uarch component type, aborting...\n')
             sys.exit()
+
+    def print_feature(self, comptype):
+        if comptype == Component.LQ:  
+            return self.lq.__str__()
+        elif comptype == Component.SQ:
+            return self.sq.__str__()
+        elif comptype == Component.ROB:
+            return self.rob.__str__()
+        elif comptype == Component.LFB:
+            return self.lfb.__str__()
+        elif comptype == Component.HWPREFETCHER:
+            return self.hwprefetcher.__str__()
+        elif comptype == Component.EXESTATUS:
+            return self.executionUnitsBusy.__str__()
+    
+
+    def comp_violators(self, state):
+        violators = []
+        for component in Component:
+           if not self.compare(component, state):
+               violators.append(component)
+        return violators
 
     def __str__(self):
         return 'Cycle: ' + \
@@ -110,8 +126,6 @@ class UArch:
                str(self.sq) + '\n' + \
                str(self.lfb) + '\n' + \
                str(self.hwprefetcher) + '\n' + \
-               str(self.intRegFile) + '\n' + \
-               str(self.fpRegFile) + '\n' + \
                str(self.executionUnitsBusy)
 
 class LoadQueue(CircularQueue):
@@ -128,14 +142,16 @@ class LoadQueue(CircularQueue):
         return False        
 
     def __str__(self):
-        return 'LQ: ' + str(self.sn) + '\n' + str(self.pc) + '\n' + str(self.address)
+        return 'LQ: ' + str(self.sn) + '\n' + \
+               '[{}]'.format(', '.join(hex(x) for x in self.pc)) + '\n' + \
+               '[{}]'.format(', '.join(hex(x) for x in self.address))
 
     def setmetaData(self):
         super(LoadQueue, self).setmetaData()
         self.sn = self.getValidEntries(self.sn)
         self.pc = self.getValidEntries(self.pc)
         self.address = self.getValidEntries(self.address)
- 
+
 class StoreQueue(CircularQueue):
     def __init__(self):
         self.sn = []
@@ -152,7 +168,9 @@ class StoreQueue(CircularQueue):
        return False
 
     def __str__(self):
-        return 'SQ: ' + str(self.sn) + '\n' + str(self.pc) + '\n' + str(self.address) + '\n' + str(self.data)
+        return 'SQ: ' + str(self.sn) + '\n' + \
+               '[{}]'.format(', '.join(hex(x) for x in self.pc)) + '\n' + \
+               '[{}]'.format(', '.join(hex(x) for x in self.address))
 
     def setmetaData(self):
         super(StoreQueue, self).setmetaData()
@@ -160,7 +178,6 @@ class StoreQueue(CircularQueue):
         self.pc = self.getValidEntries(self.pc)
         self.address = self.getValidEntries(self.address)
         self.data = self.getValidEntries(self.data)
-
 
 class ROB(CircularQueue):
     def __init__(self):
@@ -176,7 +193,8 @@ class ROB(CircularQueue):
         return False
 
     def __str__(self):
-        return 'ROB: ' + str(self.sn) + '\n' + str(self.pc)
+        return 'ROB: ' + str(self.sn) + '\n' + \
+               '[{}]'.format(', '.join(hex(x) for x in self.pc))
 
     def setmetaData(self):
         super(ROB, self).setmetaData()
@@ -192,7 +210,7 @@ class LineFillBuffer():
         return compareContent(self.data, lfbOther.data)
 
     def __str__(self):
-        return 'LFB: ' + str(self.data)
+        return 'LFB: ' + '[{}]'.format(', '.join(hex(x) for x in self.data)) 
 
 class RegisterFile():
     def __init__(self, name):
@@ -204,7 +222,7 @@ class RegisterFile():
 
     def __str__(self):
         return self.name + str(self.data)
-           
+
 class ExecutionUnitsStatus():
     def __init__(self):
         self.reqs = [0 for x in range(len(FunctionalUnits))]
@@ -226,4 +244,4 @@ class Prefetcher():
         return False
 
     def __str__(self):
-        return 'HWPREFETCHER: ' + str(self.address) + '\n' + str(self.data)
+        return 'HWPREFETCHER: ' + str(hex(self.address)) + '\n' + str(hex(self.data))

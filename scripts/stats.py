@@ -2,64 +2,71 @@ import matplotlib.pyplot as plt
 import pickle
 import sys
 import re
+import itertools
 from matplotlib import rcParams
 from Microarchitecture import *
 
 component_names = {Component.LQ: 'Load Queue', Component.SQ: 'Store Queue', Component.ROB: 'Reorder Buffer', Component.LFB: 'Line Fill Buffer', \
-                   Component.HWPREFETCHER: 'Next-Line Hardware Prefetcher', Component.IPRF: 'Integer Register File', Component.FPRF: 'Floating-Point Register File', \
+                   Component.HWPREFETCHER: 'Next-Line Hardware Prefetcher', \
                    Component.EXESTATUS: 'Execution Unit Utilization'}
+plot_blacklist = [] #Component.LFB,Component.HWPREFETCHER]
+colors = ['blue', 'darkorange', 'violet', 'green', 'maroon', 'red', 'dimgray', 'plum', 'navy', 'steelblue', 'lightgreen', 'olivedrab', 'teal', 'lightpink', 'firebrick', 'brown']
+markers = ['o', 'x', '<', '|', '*', '+', '_', '.', '^', 'P', 'X', 'D', '>', '1', '2', '3'] 
 
-def uarch_diff(component, lst1, lst2, axs, _phi, _alpha):
-    fout = open(sys.argv[4]+'/stats-'+str(component)+'.csv', 'w')
-    x, y = [], [] 
+def uarch_diff(component, theta_lst, axs, _phi, _alpha):
+    states = list()   
+    seed = list(theta_lst.keys())[0]
+    for state in theta_lst[seed][component]:
+        states.append(state[0])
 
-    states = lst2[component][:]
-    for state in lst1[component]:
-        sidx = find_index(states, lambda e: e[0].compare(component, state[0]))
-        if sidx is None:
-            states.append(state)
+    for dclass in theta_lst.keys():
+        if dclass == seed:
+            continue
+        for state in theta_lst[dclass][component]:
+            sidx = find_index(states, lambda e: e.compare(component, state[0])) 
+            if sidx is None:
+                states.append(state[0])
 
-    s = [x for x in range(len(states))]
+    obsrv = {k: [] for k in theta_lst.keys()}
     diff = list()
-    for state in states:
-        sidx1 = find_index(lst1[component], lambda e: e[0].compare(component, state[0]))
-        sidx2 = find_index(lst2[component], lambda e: e[0].compare(component, state[0]))
-     
-        if sidx1 is None:
-            x.append(0)
-        else:
-            x.append(lst1[component][sidx1][1])
-        if sidx2 is None:
-            y.append(0)
-        else:
-            y.append(lst2[component][sidx2][1])
+    stats = [[] for _ in range(len(states))]
+    for j in range(len(states)):
+        for dclass in theta_lst:
+            sidx = find_index(theta_lst[dclass][component], lambda e: e[0].compare(component, states[j]))
+            if sidx is None:
+                obsrv[dclass].append(0) 
+                stats[j].append((dclass,0))
+            else:
+                obsrv[dclass].append(theta_lst[dclass][component][sidx][1])
+                stats[j].append((dclass, theta_lst[dclass][component][sidx][1]))
 
-        if sidx1 and sidx2 is None:
-            if lst1[component][sidx1][1] >= _phi:
-                diff.append(state[0])
-        elif sidx2 and sidx1 is None:
-            if lst2[component][sidx2][1] >= _phi:
-                diff.append(state[0])
-        elif sidx1 and sidx2:
-            if (lst1[component][sidx1][1] >= _phi and lst2[component][sidx2][1] <= _alpha) or (lst2[component][sidx2][1] >= _phi and lst1[component][sidx1][1] <= _alpha):
-                diff.append(state[0])
-    
-    fout.write('bit0,'+','.join(['{:.2f}'.format(n) for n in x])+'\n') 
-    fout.write('bit1,'+','.join(['{:.2f}'.format(n) for n in y])+'\n')
-    fout.close()
 
-    if component != Component.FPRF and component != Component.IPRF:
+    for j in range(len(states)):
+        candidate = False
+        class_lbl = ''
+        alpha_violation = False
+        for freq in stats[j]:
+            if candidate and freq[1] >= _alpha:
+                candidate = False
+                break
+            elif freq[1] >= _phi and not alpha_violation: 
+                candidate = True
+                class_lbl = freq[0]
+            elif freq[1] >= _alpha:
+                alpha_violation = True
+        if candidate:
+            diff.append((class_lbl, states[j]))
+
+    if component not in plot_blacklist:
         axs.flat[component.value].axhspan(_phi, 1, color='green', alpha=0.15, label=r'$\phi$')
         axs.flat[component.value].axhspan(0, _alpha, color='red', alpha=0.15, label=r'$\alpha$')
-    #plt.ylabel('Iteration Frequency')
-    #plt.xlabel('States')
         axs.flat[component.value].set_title(component_names[component])
-        axs.flat[component.value].scatter([s[j] for j in range(len(x)) if x[j] > 0.0], [x[j] for j in range(len(x)) if x[j] > 0.0], facecolors='none', color='blue', label='e=1')
-        axs.flat[component.value].scatter([s[j] for j in range(len(y)) if y[j] > 0.0], [y[j] for j in range(len(y)) if y[j] > 0.0], marker='x', color='darkorange', label='e=0')
-    #box = ax.get_position()
-    #ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-    #ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    #plt.savefig(sys.argv[4]+'/stats-'+str(component)+'.pdf')
+        idx = 0
+        for dclass in theta_lst.keys():
+            #faceclr = 'none' if markers[idx] == 'o' else colors[idx]
+            faceclr = colors[idx]
+            axs.flat[component.value].scatter([j for j in range(len(states)) if obsrv[dclass][j] > 0.0], [obsrv[dclass][j] for j in range(len(states)) if obsrv[dclass][j] > 0.0], color=colors[idx], marker=markers[idx], facecolors=faceclr, label='e='+dclass)
+            idx = idx + 1
 
     return diff
 
@@ -68,31 +75,37 @@ finKey = open(sys.argv[2], 'r')
 instructions, loops, states = pickle.load(finUarch)
 _phi = float(sys.argv[5])
 _alpha = float(sys.argv[6])
+window = int(sys.argv[7])
+iters = int(sys.argv[8])
+n_classes = 2**window
 print('phi: {}, alpha: {}'.format(_phi, _alpha))
+print('window: {}'.format(window))
 
 keyhex = finKey.read()
 print(keyhex)
-key = ''
-for c in range(26): #100/8*2
-    key += '{:04b}'.format(int(keyhex[c], 16))
-print(key)
-key = key[::-1]
-print(len(key))
+keystr = ''
+for c in range(round(iters*window/4)): #26 #100/8*2
+    keystr += '{:04b}'.format(int(keyhex[c], 16))
+keystr = keystr[::-1]
+print(keystr)
+
+key = []
+for x in range(0, len(keystr), window):
+    key.append(keystr[x:x+window])
 print(key)
 
-loop_bit0_cnt = key.count('0')
-loop_bit1_cnt = key.count('1')
+classcnt = {w: key.count(w) for w in key} 
+print(classcnt)
 
 loopsUArch = []
 loop_unique_states = []
-states_bit1 = {}
-states_bit0 = {}
+theta_lst = {w: {} for w in key}
 diff = {}
 
 # Cross-reference RoI from begin/end instructions with UArch objects
 # for all cycles enclosed by the fetch/retire cycles for those RoI instructions.
 print("Gathering loop state samples..")
-for x in range(len(loops)-1):
+for x in range(len(loops)):
     assert loops[x][-1].retire > 0
 
     fetch = loops[x][0].fetch
@@ -101,14 +114,19 @@ for x in range(len(loops)-1):
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Verdana']
+rcParams['axes.titlesize'] = 14
+rcParams['axes.labelsize'] = 14
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(15,6))
+
+
+print('iters: {}, loops: {}'.format(iters, len(loopsUArch)))
 
 for component in Component:
     #  Collect common elements across rounds with the same key bit value
-    states_bit1[component] = []
-    states_bit0[component] = []
-    print("Finding unique and common elements for "+str(component))
-    for idx in range(len(loops)-1):
+    for dclass in theta_lst:
+        theta_lst[dclass][component] = list()
+    #print("Finding unique and common elements for "+str(component))
+    for idx in range(int(iters/window)):
         # For each UArch state object associated with the current loop iteration...
         for state in loopsUArch[idx]:
             # If this state object differs from any of the state objects we have seen so far,
@@ -128,52 +146,40 @@ for component in Component:
         # When comparing state across rounds with k=1/0, we may want to consider all states where
         # the tally count among iterations is beyond a certain threshold, say 75%.
         # We can say that, a state with a global tally >= 0.90 is representative of all iterations with k=1/0.
-        if key[idx] == '1':
-             for state in loop_unique_states:
-                sidx = find_index(states_bit1[component], lambda e: e[0].compare(component, state[0]))
-                if sidx is None:
-                    states_bit1[component].append([state[0], 1])
-                else:
-                    states_bit1[component][sidx][1] = states_bit1[component][sidx][1] + 1
-
-        elif key[idx] == '0':
-            for state in loop_unique_states:
-                sidx = find_index(states_bit0[component], lambda e: e[0].compare(component, state[0]))
-                if sidx is None:
-                    states_bit0[component].append([state[0], 1])
-                else:
-                    states_bit0[component][sidx][1] = states_bit0[component][sidx][1] + 1
+        for state in loop_unique_states:
+            sidx = find_index(theta_lst[key[idx]][component], lambda e: e[0].compare(component, state[0]))
+            if sidx is None:
+                theta_lst[key[idx]][component].append([state[0], 1])
+            else:
+                theta_lst[key[idx]][component][sidx][1] = theta_lst[key[idx]][component][sidx][1] + 1
 
         del loop_unique_states[:]
 
-    for state in states_bit1[component]:
-        state[1] = state[1]/loop_bit1_cnt
-    for state in states_bit0[component]:
-        state[1] = state[1]/loop_bit0_cnt
+    #Normalize tally by total class count
+    for dclass in theta_lst:
+        for state in theta_lst[dclass][component]:
+            state[1] = state[1]/classcnt[dclass]
 
-    diff[component] = uarch_diff(component, states_bit1, states_bit0, axs, _phi, _alpha)
+    diff[component] = uarch_diff(component, theta_lst, axs, _phi, _alpha)
                 
-    print(component)
-    print()
+    #for dclass in theta_lst.keys():
+    #    print('Unique states for dclass: '+dclass)
+    #    print(len(theta_lst[dclass][component]))
+    #    for state in theta_lst[dclass][component]:
+    #        print(state[0], state[1])
 
-    print('Unique states for bit 1')
-    print(len(states_bit1[component]))
-    for state in states_bit1[component]:
-        print(state[1])
-        print(state[0])
-
-    print('Unique states for bit 0')
-    print(len(states_bit0[component]))
-    for state in states_bit0[component]:
-        print(state[1])
-        print(state[0])
-
-    print("Diff of states")
-    print(len(diff[component]))
-
-    for state in diff[component]:
-        print(state)
-
+    print("=======================================================================================")
+    print("=========== Diff of "+str(component_names[component])+" States (Candidates)  ==========")
+    print("=======================================================================================")
+    
+    print('len: '+str(len(diff[component])))
+    if len(diff[component]) == 0:
+        print('No candidates found for '+str(component)+'!')
+    for candidate in diff[component]:
+        print('dclass: '+candidate[0])
+        print('----------')
+        print(candidate[1].print_feature(component))
+        print('----------')
 
 for i, row in enumerate(axs):
     for j, cell in enumerate(row):
@@ -181,34 +187,34 @@ for i, row in enumerate(axs):
             cell.set_xlabel("States")
         if j == 0:
             cell.set_ylabel("Iteration Frequency")
+
 plt.tight_layout()
 plt.subplots_adjust(top=0.9)
 handles, labels = axs.flat[-1].get_legend_handles_labels()
 fig.legend(handles, labels, loc='upper left', fancybox=True, shadow=True, ncol=4, mode='expand')
-plt.savefig(sys.argv[4]+'/stats.pdf', bbox_inches='tight')
+plt.savefig(sys.argv[4]+'/stats-'+str(_phi)+'_'+str(_alpha)+'.pdf', bbox_inches='tight')
 
-print('Size of the loop state lists')
+print('Size of the loop state lists:')
 print([len(loop) for loop in loopsUArch])
-print('Counters for no. loops with each bit value')
-print(loop_bit1_cnt)
-print(loop_bit0_cnt)
-print('no. cycles for each loop')
+print('Counters for no. loops with each bit value:')
+for dclass in theta_lst:
+    print(classcnt[dclass])
+print('no. cycles for each loop:')
 print([loop[-1].retire-loop[0].fetch for loop in loops])
 
-print(sum([len(loopsUArch[idx]) for idx in range(len(loops)-1) if key[idx] == '1'])/loop_bit1_cnt)
-print(sum([len(loopsUArch[idx]) for idx in range(len(loops)-1) if key[idx] == '0'])/loop_bit0_cnt)
+#print(sum([len(loopsUArch[idx]) for idx in range(len(loops)-1) if key[idx] == '1'])/loop_bit1_cnt)
+#print(sum([len(loopsUArch[idx]) for idx in range(len(loops)-1) if key[idx] == '0'])/loop_bit0_cnt)
 
 for component in Component:
-    print(str(component)+','+ \
-          str(len(states_bit1[component]))+','+ \
-          str(len(states_bit0[component]))+','+ \
-          str(len([x for x in states_bit1[component] if x[1] >= _phi]))+','+ \
-          str(len([x for x in states_bit0[component] if x[1] >= _phi]))+','+ \
-          str(len([x for x in states_bit1[component] if x[1] <= _alpha]))+','+ \
-          str(len([x for x in states_bit0[component] if x[1] <= _alpha]))+','+ \
-          str(len(diff[component])))
-
+    print(str(component))
+    for dclass in theta_lst:
+        print('\t0x'+dclass+':'+ \
+        str(len(theta_lst[dclass][component]))+','+ \
+        str(len([x for x in theta_lst[dclass][component] if x[1] >= _phi]))+','+ \
+        str(len([x for x in theta_lst[dclass][component] if x[1] <= _alpha]))+','+ \
+        str(len([x for x in diff[component] if x[0] == dclass])))
+        
 with open(sys.argv[3], 'wb') as f:
-    pickle.dump((loopsUArch, states_bit1, states_bit0, diff), f)
+    pickle.dump((loopsUArch, theta_lst, diff, key), f)
 
 print('done.')

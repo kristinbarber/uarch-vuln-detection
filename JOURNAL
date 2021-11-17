@@ -33,3 +33,9 @@ This process again is performed for every uarch structure, where what constitues
 
 time ./scripts/do_stats.sh 0xaa 0x0000024fcc 0x000001039a 0x000002509a 0x00000305b6 0x00000305d8 bearssl consttime
 time ./scripts/do_stats.sh 0x44 0x0000024fcc 0x000001039a 0x000002509a 0x00000305b6 '0x00000305cc 0x00000305d0' bearssl vuln
+
+09-30-2021:
+-----------
+
+Command to run the statistics collection on a single run of the constant-time algorithm application, with the key 0xaa (repeated for 1024 bits) and setting similarity thresholds as 80% and 20%.
+./scripts/launch_runs.sh -mode stats -appsi consttime -phi .8 -alpha .2 -keysi "0xaa"

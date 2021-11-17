@@ -19,7 +19,7 @@ for line in lines:
     match = re.search(diff_regex, fname)
     key = match.group(2)
     print('Loading from '+fname+'...')
-    loopsUArch, states_bit1, states_bit0, diff = pickle.load(open(fname, 'rb'))
+    loopsUArch, theta_lst, diff = pickle.load(open(fname, 'rb'))
     loop_states[key] = loopsUArch
     diffs[key] = diff
 
@@ -41,29 +41,54 @@ for component in Component:
         print(len(diffs[key][component]))
         for state in diffs[key][component]:
             if component == Component.LQ:
-                print(state.lq.__str__())
+                print(state[1].lq.__str__())
             elif component == Component.SQ:
-                print(state.sq.__str__())
+                print(state[1].sq.__str__())
             elif component == Component.ROB:
-               print(state.rob.__str__())
+                print(state[1].rob.__str__())
             elif component == Component.LFB:
-              print(state.lfb.__str__())
+                print(state[1].lfb.__str__())
             elif component == Component.HWPREFETCHER:
-              print(state.hwprefetcher.__str__())
+                print(state[1].hwprefetcher.__str__())
+            elif component == Component.EXESTATUS:
+                print(state[1].executionUnitsBusy.__str__())
 
 global_diff = {comp: [] for comp in Component}
+seed = '0xaa'
 for component in Component:
-    for state in diffs['0xaa'][component]:
-        cnt = 0
-        for key in diffs: #['0x44', 'rand0']:
-            idx = find_index(diffs[key][component], lambda e: e.compare(component, state))
-            if idx:
-                cnt = cnt + 1
-        global_diff[component].append(cnt)
+    for s in diffs[seed][component]:
+        global_diff[component].append([s[1], 1])
+    for key in diffs:
+        if key == seed:
+            continue
+        for state in diffs[key][component]:
+            idx = find_index(global_diff[component], lambda e: e[0].compare(component, state[1]))
+            if idx is None:
+                global_diff[component].append([state[1], 1])
+            else:
+                global_diff[component][idx][1] = global_diff[component][idx][1] + 1
 
 for comp in Component:
-    print(global_diff[comp])
-
+    print(comp)
+    tot = len(global_diff[comp])
+    print('nKeys: '+str(len(diffs)))
+    if tot == 0:
+        continue
+    inv = len([x for x in global_diff[comp] if x[1] == len(diffs)])
+    print(str(tot), str(inv), str(float(inv/tot)))
+    for state in global_diff[comp]:
+        if comp == Component.LQ:
+            print(str(state[1])+': '), print(state[0].lq.__str__())
+        elif comp == Component.SQ:
+            print(str(state[1])+': '), print(state[0].sq.__str__())
+        elif comp == Component.ROB:
+            print(str(state[1])+': '), print(state[0].rob.__str__())
+        elif comp == Component.LFB:
+            print(str(state[1])+': '), print(state[0].lfb.__str__())
+        elif comp == Component.HWPREFETCHER:
+            print(str(state[1])+': '), print(state[0].hwprefetcher.__str__()) 
+        elif comp ==  Component.EXESTATUS:
+            print(str(state[1])+': '), print(state[0].executionUnitsBusy.__str__())
 
 """diff_cnt = {}
 diff_states = {}

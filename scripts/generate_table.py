@@ -4,11 +4,12 @@ import sys
 import re
 from Microarchitecture import *
 
-diff_regex = re.compile('logs/bearssl/([a-z]+)/([\.\_\-x0-9a-z]+)/sets.pickle')
+diff_regex = re.compile('logs/bearssl/([a-z]+)/100/([\.\_\-x0-9a-z]+)/sets.pickle')
 
-blob = os.popen('ls logs/bearssl/'+sys.argv[1]+'/*/sets.pickle')
+blob = os.popen('ls logs/bearssl/'+sys.argv[1]+'/100/*/sets.pickle')
 traces = blob.readlines()
 table = open('table-'+sys.argv[1]+'.csv', 'w+')
+iters = 100
 
 diffs = {}
 testnames = {}
@@ -28,7 +29,7 @@ header = 'LQ-OCPNCY,LQ-PC,LQ-ADDR,SQ-OCPNY,SQ-PC,SQ-ADDR,ROB-OCPNY,ROB-PC,LFB-DA
 row = ''
 table.write(header+'\n')
 for keystr in testnames:
-    for loop in range(len(testnames[keystr])):
+    for loop in range(iters):
         for state in testnames[keystr][loop]:
             row += str(state.lq.occupancy) + ','
             for x in range(8):

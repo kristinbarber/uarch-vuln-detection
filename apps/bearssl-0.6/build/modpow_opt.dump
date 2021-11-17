@@ -1,0 +1,228 @@
+00000000000121a4 <br_i31_modpow_opt>:
+br_i31_modpow_opt():
+   121a4:	7135                	addi	sp,sp,-160
+   121a6:	fcce                	sd	s3,120(sp)
+   121a8:	0006a983          	lw	s3,0(a3)
+   121ac:	f4d6                	sd	s5,104(sp)
+   121ae:	f0da                	sd	s6,96(sp)
+   121b0:	03f9899b          	addiw	s3,s3,63
+   121b4:	0059d99b          	srliw	s3,s3,0x5
+   121b8:	00198a93          	addi	s5,s3,1
+   121bc:	ffeafa93          	andi	s5,s5,-2
+   121c0:	8b3e                	mv	s6,a5
+   121c2:	ed06                	sd	ra,152(sp)
+   121c4:	e922                	sd	s0,144(sp)
+   121c6:	e526                	sd	s1,136(sp)
+   121c8:	e14a                	sd	s2,128(sp)
+   121ca:	f8d2                	sd	s4,112(sp)
+   121cc:	ecde                	sd	s7,88(sp)
+   121ce:	e8e2                	sd	s8,80(sp)
+   121d0:	e4e6                	sd	s9,72(sp)
+   121d2:	e0ea                	sd	s10,64(sp)
+   121d4:	fc6e                	sd	s11,56(sp)
+   121d6:	ec2e                	sd	a1,24(sp)
+   121d8:	e43a                	sd	a4,8(sp)
+   121da:	001a9793          	slli	a5,s5,0x1
+   121de:	20f86e63          	bltu	a6,a5,123fa <br_i31_modpow_opt+0x256>
+   121e2:	02100793          	li	a5,33
+   121e6:	02fa87b3          	mul	a5,s5,a5
+   121ea:	842a                	mv	s0,a0
+   121ec:	8c32                	mv	s8,a2
+   121ee:	84b6                	mv	s1,a3
+   121f0:	4915                	li	s2,5
+   121f2:	02f87563          	bgeu	a6,a5,1221c <br_i31_modpow_opt+0x78>
+   121f6:	47c5                	li	a5,17
+   121f8:	02fa87b3          	mul	a5,s5,a5
+   121fc:	4911                	li	s2,4
+   121fe:	00f87f63          	bgeu	a6,a5,1221c <br_i31_modpow_opt+0x78>
+   12202:	47a5                	li	a5,9
+   12204:	02fa87b3          	mul	a5,s5,a5
+   12208:	490d                	li	s2,3
+   1220a:	00f87963          	bgeu	a6,a5,1221c <br_i31_modpow_opt+0x78>
+   1220e:	4795                	li	a5,5
+   12210:	02fa87b3          	mul	a5,s5,a5
+   12214:	4909                	li	s2,2
+   12216:	00f87363          	bgeu	a6,a5,1221c <br_i31_modpow_opt+0x78>
+   1221a:	4905                	li	s2,1
+   1221c:	0005f537          	lui	a0,0x5f
+   12220:	85ca                	mv	a1,s2
+   12222:	1a850513          	addi	a0,a0,424 # 5f1a8 <K+0x120>
+   12226:	17e060ef          	jal	ra,183a4 <_IO_printf>
+   1222a:	85a6                	mv	a1,s1
+   1222c:	8522                	mv	a0,s0
+   1222e:	672000ef          	jal	ra,128a0 <br_i31_to_monty>
+   12232:	002a9d13          	slli	s10,s5,0x2
+   12236:	4785                	li	a5,1
+   12238:	098a                	slli	s3,s3,0x2
+   1223a:	01ab0cb3          	add	s9,s6,s10
+   1223e:	06f91d63          	bne	s2,a5,122b8 <br_i31_modpow_opt+0x114>
+   12242:	864e                	mv	a2,s3
+   12244:	85a2                	mv	a1,s0
+   12246:	8566                	mv	a0,s9
+   12248:	7a1190ef          	jal	ra,2c1e8 <memcpy>
+   1224c:	4090                	lw	a2,0(s1)
+   1224e:	4581                	li	a1,0
+   12250:	00440513          	addi	a0,s0,4
+   12254:	c010                	sw	a2,0(s0)
+   12256:	267d                	addiw	a2,a2,31
+   12258:	0056561b          	srliw	a2,a2,0x5
+   1225c:	060a                	slli	a2,a2,0x2
+   1225e:	669190ef          	jal	ra,2c0c6 <memset>
+   12262:	409c                	lw	a5,0(s1)
+   12264:	4705                	li	a4,1
+   12266:	8626                	mv	a2,s1
+   12268:	27fd                	addiw	a5,a5,31
+   1226a:	0057d79b          	srliw	a5,a5,0x5
+   1226e:	078a                	slli	a5,a5,0x2
+   12270:	97a2                	add	a5,a5,s0
+   12272:	c398                	sw	a4,0(a5)
+   12274:	4581                	li	a1,0
+   12276:	8522                	mv	a0,s0
+   12278:	360000ef          	jal	ra,125d8 <br_i31_muladd_small>
+   1227c:	004c8793          	addi	a5,s9,4
+   12280:	4d81                	li	s11,0
+   12282:	e802                	sd	zero,16(sp)
+   12284:	f03e                	sd	a5,32(sp)
+   12286:	07b04363          	bgtz	s11,122ec <br_i31_modpow_opt+0x148>
+   1228a:	060c1763          	bnez	s8,122f8 <br_i31_modpow_opt+0x154>
+   1228e:	6622                	ld	a2,8(sp)
+   12290:	8522                	mv	a0,s0
+   12292:	85a6                	mv	a1,s1
+   12294:	67d000ef          	jal	ra,13110 <br_i31_from_monty>
+   12298:	4505                	li	a0,1
+   1229a:	60ea                	ld	ra,152(sp)
+   1229c:	644a                	ld	s0,144(sp)
+   1229e:	64aa                	ld	s1,136(sp)
+   122a0:	690a                	ld	s2,128(sp)
+   122a2:	79e6                	ld	s3,120(sp)
+   122a4:	7a46                	ld	s4,112(sp)
+   122a6:	7aa6                	ld	s5,104(sp)
+   122a8:	7b06                	ld	s6,96(sp)
+   122aa:	6be6                	ld	s7,88(sp)
+   122ac:	6c46                	ld	s8,80(sp)
+   122ae:	6ca6                	ld	s9,72(sp)
+   122b0:	6d06                	ld	s10,64(sp)
+   122b2:	7de2                	ld	s11,56(sp)
+   122b4:	610d                	addi	sp,sp,160
+   122b6:	8082                	ret
+   122b8:	4a05                	li	s4,1
+   122ba:	01ac8db3          	add	s11,s9,s10
+   122be:	012a1a3b          	sllw	s4,s4,s2
+   122c2:	864e                	mv	a2,s3
+   122c4:	85a2                	mv	a1,s0
+   122c6:	856e                	mv	a0,s11
+   122c8:	1a02                	slli	s4,s4,0x20
+   122ca:	71f190ef          	jal	ra,2c1e8 <memcpy>
+   122ce:	020a5a13          	srli	s4,s4,0x20
+   122d2:	4b89                	li	s7,2
+   122d4:	6722                	ld	a4,8(sp)
+   122d6:	85ee                	mv	a1,s11
+   122d8:	9dea                	add	s11,s11,s10
+   122da:	86a6                	mv	a3,s1
+   122dc:	8622                	mv	a2,s0
+   122de:	856e                	mv	a0,s11
+   122e0:	0b85                	addi	s7,s7,1
+   122e2:	11c000ef          	jal	ra,123fe <br_i31_montymul>
+   122e6:	ff4be7e3          	bltu	s7,s4,122d4 <br_i31_modpow_opt+0x130>
+   122ea:	b78d                	j	1224c <br_i31_modpow_opt+0xa8>
+   122ec:	8bca                	mv	s7,s2
+   122ee:	032dd463          	bge	s11,s2,12316 <br_i31_modpow_opt+0x172>
+   122f2:	8bee                	mv	s7,s11
+   122f4:	020c0163          	beqz	s8,12316 <br_i31_modpow_opt+0x172>
+   122f8:	67c2                	ld	a5,16(sp)
+   122fa:	1c7d                	addi	s8,s8,-1
+   122fc:	2da1                	addiw	s11,s11,8
+   122fe:	0087971b          	slliw	a4,a5,0x8
+   12302:	67e2                	ld	a5,24(sp)
+   12304:	8bca                	mv	s7,s2
+   12306:	0007c783          	lbu	a5,0(a5)
+   1230a:	8fd9                	or	a5,a5,a4
+   1230c:	2781                	sext.w	a5,a5
+   1230e:	e83e                	sd	a5,16(sp)
+   12310:	67e2                	ld	a5,24(sp)
+   12312:	0785                	addi	a5,a5,1
+   12314:	ec3e                	sd	a5,24(sp)
+   12316:	57fd                	li	a5,-1
+   12318:	01779a3b          	sllw	s4,a5,s7
+   1231c:	67c2                	ld	a5,16(sp)
+   1231e:	417d8dbb          	subw	s11,s11,s7
+   12322:	fffa4a13          	not	s4,s4
+   12326:	01b7d53b          	srlw	a0,a5,s11
+   1232a:	00aa7a33          	and	s4,s4,a0
+   1232e:	2a01                	sext.w	s4,s4
+   12330:	4881                	li	a7,0
+   12332:	6722                	ld	a4,8(sp)
+   12334:	86a6                	mv	a3,s1
+   12336:	8622                	mv	a2,s0
+   12338:	85a2                	mv	a1,s0
+   1233a:	855a                	mv	a0,s6
+   1233c:	f446                	sd	a7,40(sp)
+   1233e:	0c0000ef          	jal	ra,123fe <br_i31_montymul>
+   12342:	864e                	mv	a2,s3
+   12344:	85da                	mv	a1,s6
+   12346:	8522                	mv	a0,s0
+   12348:	6a1190ef          	jal	ra,2c1e8 <memcpy>
+   1234c:	78a2                	ld	a7,40(sp)
+   1234e:	2885                	addiw	a7,a7,1
+   12350:	ff78c1e3          	blt	a7,s7,12332 <br_i31_modpow_opt+0x18e>
+   12354:	0005f7b7          	lui	a5,0x5f
+   12358:	1b878513          	addi	a0,a5,440 # 5f1b8 <K+0x130>
+   1235c:	85d2                	mv	a1,s4
+   1235e:	046060ef          	jal	ra,183a4 <_IO_printf>
+   12362:	4785                	li	a5,1
+   12364:	02f91563          	bne	s2,a5,1238e <br_i31_modpow_opt+0x1ea>
+   12368:	6722                	ld	a4,8(sp)
+   1236a:	86a6                	mv	a3,s1
+   1236c:	8666                	mv	a2,s9
+   1236e:	85a2                	mv	a1,s0
+   12370:	855a                	mv	a0,s6
+   12372:	08c000ef          	jal	ra,123fe <br_i31_montymul>
+   12376:	4140053b          	negw	a0,s4
+   1237a:	00aa6533          	or	a0,s4,a0
+   1237e:	86ce                	mv	a3,s3
+   12380:	865a                	mv	a2,s6
+   12382:	85a2                	mv	a1,s0
+   12384:	01f5551b          	srliw	a0,a0,0x1f
+   12388:	2e1000ef          	jal	ra,12e68 <br_ccopy>
+   1238c:	bded                	j	12286 <br_i31_modpow_opt+0xe2>
+   1238e:	4090                	lw	a2,0(s1)
+   12390:	7502                	ld	a0,32(sp)
+   12392:	4581                	li	a1,0
+   12394:	00cca023          	sw	a2,0(s9)
+   12398:	267d                	addiw	a2,a2,31
+   1239a:	0056561b          	srliw	a2,a2,0x5
+   1239e:	060a                	slli	a2,a2,0x2
+   123a0:	527190ef          	jal	ra,2c0c6 <memset>
+   123a4:	4785                	li	a5,1
+   123a6:	017797bb          	sllw	a5,a5,s7
+   123aa:	02079713          	slli	a4,a5,0x20
+   123ae:	01ac8533          	add	a0,s9,s10
+   123b2:	9301                	srli	a4,a4,0x20
+   123b4:	4605                	li	a2,1
+   123b6:	014647b3          	xor	a5,a2,s4
+   123ba:	40f006bb          	negw	a3,a5
+   123be:	8fd5                	or	a5,a5,a3
+   123c0:	01f7d79b          	srliw	a5,a5,0x1f
+   123c4:	7882                	ld	a7,32(sp)
+   123c6:	0017c793          	xori	a5,a5,1
+   123ca:	40f007bb          	negw	a5,a5
+   123ce:	4585                	li	a1,1
+   123d0:	0155e763          	bltu	a1,s5,123de <br_i31_modpow_opt+0x23a>
+   123d4:	0605                	addi	a2,a2,1
+   123d6:	956a                	add	a0,a0,s10
+   123d8:	fce66fe3          	bltu	a2,a4,123b6 <br_i31_modpow_opt+0x212>
+   123dc:	b771                	j	12368 <br_i31_modpow_opt+0x1c4>
+   123de:	00259693          	slli	a3,a1,0x2
+   123e2:	96aa                	add	a3,a3,a0
+   123e4:	4294                	lw	a3,0(a3)
+   123e6:	0008a303          	lw	t1,0(a7)
+   123ea:	0585                	addi	a1,a1,1
+   123ec:	8efd                	and	a3,a3,a5
+   123ee:	0066e6b3          	or	a3,a3,t1
+   123f2:	00d8a023          	sw	a3,0(a7)
+   123f6:	0891                	addi	a7,a7,4
+   123f8:	bfe1                	j	123d0 <br_i31_modpow_opt+0x22c>
+   123fa:	4501                	li	a0,0
+   123fc:	bd79                	j	1229a <br_i31_modpow_opt+0xf6>
+
+00000000000123fe <br_i31_montymul>:
