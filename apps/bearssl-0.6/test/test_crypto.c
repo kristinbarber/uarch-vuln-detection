@@ -3220,6 +3220,30 @@ static void test_AES_small_single(char *aes_256h_key)
     memcpy(buf, plain, sizeof plain);
     memset(iv, 0, sizeof iv);
     ve->run(ec, iv, buf, sizeof buf);
+=======
+static void test_AES_big_single(char *aes_256h_key)
+{
+	  size_t u = 0;
+
+		printf("Test AES big single\n");
+		fflush(stdout);
+
+		const br_block_cbcenc_class *ve = &br_aes_big_cbcenc_vtable;
+		unsigned char key[32];
+		unsigned char plain[16];
+		unsigned char buf[16];
+		unsigned char iv[16];
+		size_t key_len;
+		br_aes_gen_cbcenc_keys v_ec;
+		const br_block_cbcenc_class **ec;
+		ec = &v_ec.vtable;
+		key_len = hextobin(key, aes_256h_key);
+		hextobin(plain, KAT_AES[u + 1]);
+		ve->init(ec, key, key_len);
+		memcpy(buf, plain, sizeof plain);
+		memset(iv, 0, sizeof iv);
+		ve->run(ec, iv, buf, sizeof buf);
+>>>>>>> 9cd2990d76eb7ea2f9b7610ed0d8cade3e90dfd3:bearssl-0.6/test/test_crypto.c
 }
 
 static void
@@ -8578,6 +8602,24 @@ int main(int argc, char *argv[])
 
     else
         printf("Test not supported\n");
+=======
+    unsigned char buffer[128];
+		char *testname = argv[1];
+    char *pos = argv[2];
+
+		if (strcmp(testname, "modpow") == 0) {
+    	for (count = 0; count < sizeof buffer/sizeof *buffer; count++) {
+        	sscanf(pos, "%2hhx", &buffer[count]);
+        	pos += 2;
+    	}
+
+    	test_modpow_opt_i31_single(buffer);
+		}
+
+		else if (strcmp(testname, "aes_big")) {
+				test_AES_big_single(pos);
+		}
+>>>>>>> 9cd2990d76eb7ea2f9b7610ed0d8cade3e90dfd3:bearssl-0.6/test/test_crypto.c
 
     return 0;
 }
