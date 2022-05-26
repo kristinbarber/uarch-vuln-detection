@@ -16,4 +16,4 @@ all: $(BIN)
 .PHONY: clean
 
 clean:
-	rm -f $(BDIR)/*.o
+	rm -f $(BDIR)/*
