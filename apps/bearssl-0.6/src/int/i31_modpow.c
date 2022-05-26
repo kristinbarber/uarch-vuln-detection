@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+#include <stdio.h>
 #include "inner.h"
 
 /* see inner.h */
@@ -32,7 +32,6 @@ br_i31_modpow(uint32_t *x,
 {
 	size_t mlen;
 	uint32_t k;
-        uint32_t r[35];
 
 	/*
 	 * 'mlen' is the length of m[] expressed in bytes (including
@@ -57,14 +56,154 @@ br_i31_modpow(uint32_t *x,
 	for (k = 0; k < ((uint32_t)elen << 3); k ++) {
 		uint32_t ctl;
 		ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
+#ifdef DEBUG
 	        printf("====== Round %u, e=%u  ======\n", k, ctl);
+#endif
 		br_i31_montymul(t2, x, t1, m, m0i);
- 		br_ccopy_v2(ctl, x, r, t2, mlen);
+ 		CCOPY(ctl, x, t2, mlen);
 		br_i31_montymul(t2, t1, t1, m, m0i);
-//                if (ctl) 
-//		{
-//		    br_i31_montymul(t2, x, t1, m, m0i);
-//		}
 		memcpy(t1, t2, mlen);
 	}
+}
+
+
+void
+br_i31_modpow_fence(uint32_t *x,
+        const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2)
+{
+        size_t mlen;
+        uint32_t k;
+
+        mlen = ((m[0] + 63) >> 5) * sizeof m[0];
+        memcpy(t1, x, mlen);
+        br_i31_to_monty(t1, m);
+        br_i31_zero(x, m[0]);
+        x[1] = 1;
+
+        for (k = 0; k < ((uint32_t)elen << 3); k ++) {
+                uint32_t ctl;
+                ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
+#ifdef DEBUG
+                printf("====== Round %u, e=%u  ======\n", k, ctl);
+#endif
+                br_i31_montymul(t2, x, t1, m, m0i);
+                __asm__("fence");
+                CCOPY(ctl, x, t2, mlen);
+                __asm__("fence");
+                br_i31_montymul(t2, t1, t1, m, m0i);
+                memcpy(t1, t2, mlen);
+        }
+}
+
+void
+br_i31_modpow_v1(uint32_t *x,
+        const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2)
+{
+        size_t mlen;
+        uint32_t k;
+
+        mlen = ((m[0] + 63) >> 5) * sizeof m[0];
+
+        memcpy(t1, x, mlen);
+        br_i31_to_monty(t1, m);
+        br_i31_zero(x, m[0]);
+        x[1] = 1;
+        for (k = 0; k < ((uint32_t)elen << 3); k ++) {
+                uint32_t ctl;
+                ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
+#ifdef DEBUG
+                printf("====== Round %u, e=%u  ======\n", k, ctl);
+#endif
+                br_i31_montymul(t2, x, t1, m, m0i);
+                br_ccopy_v1(ctl, x, t2, mlen);
+                br_i31_montymul(t2, t1, t1, m, m0i);
+                memcpy(t1, t2, mlen);
+        }
+}
+
+void
+br_i31_modpow_v1_fence(uint32_t *x,
+        const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2)
+{
+        size_t mlen;
+        uint32_t k;
+
+        mlen = ((m[0] + 63) >> 5) * sizeof m[0];
+
+        memcpy(t1, x, mlen);
+        br_i31_to_monty(t1, m);
+        br_i31_zero(x, m[0]);
+        x[1] = 1;
+        for (k = 0; k < ((uint32_t)elen << 3); k ++) {
+                uint32_t ctl;
+                ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
+#ifdef DEBUG
+                printf("====== Round %u, e=%u  ======\n", k, ctl);
+#endif
+                br_i31_montymul(t2, x, t1, m, m0i);
+                __asm__("fence");
+                br_ccopy_v1(ctl, x, t2, mlen);
+                __asm__("fence");
+                br_i31_montymul(t2, t1, t1, m, m0i);
+                memcpy(t1, t2, mlen);
+        }
+}
+
+void
+br_i31_modpow_v2(uint32_t *x, uint32_t *r,
+        const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2)
+{
+        size_t mlen;
+        uint32_t k;
+
+        mlen = ((m[0] + 63) >> 5) * sizeof m[0];
+
+        memcpy(t1, x, mlen);
+        br_i31_to_monty(t1, m);
+        br_i31_zero(x, m[0]);
+        x[1] = 1;
+        for (k = 0; k < ((uint32_t)elen << 3); k ++) {
+                uint32_t ctl;
+                ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
+#ifdef DEBUG
+                printf("====== Round %u, e=%u  ======\n", k, ctl);
+#endif
+                br_i31_montymul(t2, x, t1, m, m0i);
+                br_ccopy_v2(ctl, x, r, t2, mlen);
+                br_i31_montymul(t2, t1, t1, m, m0i);
+                memcpy(t1, t2, mlen);
+        }
+}
+
+void
+br_i31_modpow_v2_fence(uint32_t *x, uint32_t *r, 
+        const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2)
+{
+        size_t mlen;
+        uint32_t k;
+
+        mlen = ((m[0] + 63) >> 5) * sizeof m[0];
+
+        memcpy(t1, x, mlen);
+        br_i31_to_monty(t1, m); 
+        br_i31_zero(x, m[0]);
+        x[1] = 1;
+        for (k = 0; k < ((uint32_t)elen << 3); k ++) {
+                uint32_t ctl;
+                ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
+#ifdef DEBUG
+                printf("====== Round %u, e=%u  ======\n", k, ctl);
+#endif
+                br_i31_montymul(t2, x, t1, m, m0i);
+                __asm__("fence");
+                br_ccopy_v2(ctl, x, r, t2, mlen);
+                __asm__("fence");
+                br_i31_montymul(t2, t1, t1, m, m0i);
+                memcpy(t1, t2, mlen);
+        }
 }

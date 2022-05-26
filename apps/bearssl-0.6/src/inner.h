@@ -881,6 +881,8 @@ LE0(int32_t x)
  */
 void br_ccopy(uint32_t ctl, void *dst, const void *src, size_t len);
 
+void br_ccopy_v1(uint32_t ctl, void *dst, const void *src, size_t len);
+
 void br_ccopy_v2(uint32_t ctl, void *dst, void *dummy, const void *src, size_t len);
 
 #define CCOPY   br_ccopy
@@ -1455,6 +1457,21 @@ void br_i31_from_monty(uint32_t *x, const uint32_t *m, uint32_t m0i);
  */
 void br_i31_modpow(uint32_t *x, const unsigned char *e, size_t elen,
 	const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+
+void br_i31_modpow_fence(uint32_t *x, const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+
+void br_i31_modpow_v1(uint32_t *x, const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+
+void br_i31_modpow_v1_fence(uint32_t *x, const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+
+void br_i31_modpow_v2(uint32_t *x, uint32_t *r, const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+
+void br_i31_modpow_v2_fence(uint32_t *x, uint32_t *r, const unsigned char *e, size_t elen,
+        const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
 
 /*
  * Compute a modular exponentiation. x[] MUST be an integer modulo m[]

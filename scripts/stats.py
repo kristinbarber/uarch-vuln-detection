@@ -40,22 +40,27 @@ def uarch_diff(component, theta_lst, axs, _phi, _alpha):
                 obsrv[dclass].append(theta_lst[dclass][component][sidx][1])
                 stats[j].append((dclass, theta_lst[dclass][component][sidx][1]))
 
+    obsrv_candidates = {k: [] for k in theta_lst.keys()}
+    for dclass in theta_lst:
+        obsrv_candidates[dclass] = [0] * len(states) 
 
     for j in range(len(states)):
-        candidate = False
-        class_lbl = ''
+        candidate = None 
         alpha_violation = False
         for freq in stats[j]:
             if candidate and freq[1] >= _alpha:
-                candidate = False
+                candidate = None
                 break
             elif freq[1] >= _phi and not alpha_violation: 
-                candidate = True
-                class_lbl = freq[0]
+                candidate = freq
             elif freq[1] >= _alpha:
                 alpha_violation = True
         if candidate:
+            class_lbl = candidate[0]
+            candidate_freq = candidate[1]
             diff.append((class_lbl, states[j]))
+            obsrv_candidates[class_lbl][j] = candidate_freq 
+
 
     if component not in plot_blacklist:
         axs.flat[component.value].axhspan(_phi, 1, color='green', alpha=0.15, label=r'$\phi$')
@@ -66,6 +71,7 @@ def uarch_diff(component, theta_lst, axs, _phi, _alpha):
             #faceclr = 'none' if markers[idx] == 'o' else colors[idx]
             faceclr = colors[idx]
             axs.flat[component.value].scatter([j for j in range(len(states)) if obsrv[dclass][j] > 0.0], [obsrv[dclass][j] for j in range(len(states)) if obsrv[dclass][j] > 0.0], color=colors[idx], marker=markers[idx], facecolors=faceclr, label='e='+dclass)
+            #axs.flat[component.value].scatter([j for j in range(len(states)) if obsrv_candidates[dclass][j] > 0.0], [obsrv_candidates[dclass][j] for j in range(len(states)) if obsrv_candidates[dclass][j] > 0.0], color='gold', marker='*', edgecolors='black', s=90)
             idx = idx + 1
 
     return diff
@@ -84,7 +90,7 @@ print('window: {}'.format(window))
 keyhex = finKey.read()
 print(keyhex)
 keystr = ''
-for c in range(round(iters*window/4)): #26 #100/8*2
+for c in range(round(len(loops)*window/4)): #26 #100/8*2
     keystr += '{:04b}'.format(int(keyhex[c], 16))
 keystr = keystr[::-1]
 print(keystr)
@@ -118,6 +124,7 @@ rcParams['axes.titlesize'] = 14
 rcParams['axes.labelsize'] = 14
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(15,6))
 
+assert len(loops) == len(loopsUArch)
 
 print('iters: {}, loops: {}'.format(iters, len(loopsUArch)))
 
@@ -127,6 +134,8 @@ for component in Component:
         theta_lst[dclass][component] = list()
     #print("Finding unique and common elements for "+str(component))
     for idx in range(int(iters/window)):
+        #if component == Component.EXESTATUS:
+        #    print('ITER {}'.format(idx))
         # For each UArch state object associated with the current loop iteration...
         for state in loopsUArch[idx]:
             # If this state object differs from any of the state objects we have seen so far,
@@ -135,10 +144,13 @@ for component in Component:
             # previously collected state objects for that component. 'sidx' indicates if a match was found for an "equivalent" state,
             # and a tally is updated to reflect how many repititions of the given (component,state) have been seen for this iteration.
             sidx = find_index(loop_unique_states, lambda e: e[0].compare(component, state))
+            #if component == Component.EXESTATUS:
+            #    print(state.print_feature(Component.EXESTATUS), sidx)
             if sidx is None:
                 loop_unique_states.append([state, 1])
             else:
                 loop_unique_states[sidx][1] = loop_unique_states[sidx][1] + 1
+
         # Now, update global tallies in states_bit1/0 for all unique states, with respect to 'component',
         # across all iterations. The tally per state must be <= 100, as there are 100 rounds being analyzed,
         # and is performed seperately for rounds with k=0 and k=1.
@@ -194,6 +206,27 @@ handles, labels = axs.flat[-1].get_legend_handles_labels()
 fig.legend(handles, labels, loc='upper left', fancybox=True, shadow=True, ncol=4, mode='expand')
 plt.savefig(sys.argv[4]+'/stats-'+str(_phi)+'_'+str(_alpha)+'.pdf', bbox_inches='tight')
 
+dtlbm = [0] * int(iters/window) 
+dcachem = [0] * int(iters/window) 
+fmiss = open(sys.argv[4]+'/miss_stats.csv', 'w+')
+fmiss.write('ITERN,STATEN,MISSN,TYPE,PC,PADDR\n')
+for idx in range(int(iters/window)):
+    for s in range(len(loopsUArch[idx])):
+        dtlbm[idx] += loopsUArch[idx][s].dtlbMisses.num_misses()
+        dcachem[idx] += loopsUArch[idx][s].dcacheMisses.num_misses() 
+        for j in range(loopsUArch[idx][s].dtlbMisses.num_misses()):
+            fmiss.write(str(idx)+','+str(s)+','+str(j)+','+'DTLB,'+loopsUArch[idx][s].dtlbMisses.pc[j]+','+loopsUArch[idx][s].dtlbMisses.paddr[j]+'\n')
+        for j in range(loopsUArch[idx][s].dcacheMisses.num_misses()):
+            fmiss.write(str(idx)+','+str(s)+','+str(j)+','+'DCACHE,'+loopsUArch[idx][s].dcacheMisses.pc[j]+'\n')
+fmiss.close()
+
+print('+++++++++++++++++++++++++++++++')
+for idx in range(int(iters/window)):
+    for s in range(len(loopsUArch[idx])):
+        print('loop: {}, state: {}, exe_unit {}'.format(idx, s, loopsUArch[idx][s].executionUnits.exeReqs))
+
+print('+++++++++++++++++++++++++++++++')
+
 print('Size of the loop state lists:')
 print([len(loop) for loop in loopsUArch])
 print('Counters for no. loops with each bit value:')
@@ -201,6 +234,19 @@ for dclass in theta_lst:
     print(classcnt[dclass])
 print('no. cycles for each loop:')
 print([loop[-1].retire-loop[0].fetch for loop in loops])
+for x in range(len(loops)):
+    print('iter: {}, cycle_begin: {}, cycle_end: {}'.format(x, loops[x][0].fetch, loops[x][-1].retire))
+
+print('dtlb misses for each loop:')
+print([dtlbm[x] for x in range(int(iters/window))])
+print('dcache misses for each loop:')
+print([dcachem[x] for x in range(int(iters/window))])
+
+#for dclass in theta_lst.keys():
+#    print(dclass)
+#    for state in theta_lst[dclass][Component.EXESTATUS]:
+#        print(state[0].print_feature(Component.EXESTATUS))
+#        print(state[1])
 
 #print(sum([len(loopsUArch[idx]) for idx in range(len(loops)-1) if key[idx] == '1'])/loop_bit1_cnt)
 #print(sum([len(loopsUArch[idx]) for idx in range(len(loops)-1) if key[idx] == '0'])/loop_bit0_cnt)

@@ -1,5 +1,7 @@
 import pickle
 import Instruction
 import Microarchitecture
+import sys
 
-instructions, loops, states = pickle.load(open('../logs/openssl/vuln/1000/0xaa/uarch.pickle', 'rb')) 
+fname = sys.argv[1]
+instructions, loops, states = pickle.load(open(fname, 'rb')) 

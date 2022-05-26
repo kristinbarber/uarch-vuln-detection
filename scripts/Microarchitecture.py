@@ -32,6 +32,7 @@ def compareContent(x, y):
 class CircularQueue:
     def __init__(self):
         self.ptr = [] 
+        self.valid = []
         self.occupancy = 0
         self.head = -1
         self.tail = -1
@@ -48,14 +49,30 @@ class CircularQueue:
             except ValueError as e:
                 raise e
         self.occupancy = abs(tail - head)
+#        self.occupancy = len([self.valid[i] for i in range(len(self.valid)) if self.valid[i] == 'V'])
         self.head = head
         self.tail = tail    
 
     def getValidEntries(self, lst):
+#        return [lst[i] for i in range(len(self.valid)) if self.valid[i] == 'V']
         if self.head > self.tail:
            return [lst[i] for i in range(self.tail+1, self.head+1)] 
         else:
             return lst[self.head:self.tail]
+
+
+class ExecutionUnits:
+    def __init__(self):
+        self.exeReqs = {FunctionalUnits.ALU: '', FunctionalUnits.ADDRGEN: '', FunctionalUnits.MUL: '', FunctionalUnits.DIV: ''}
+
+    def __eq__(self, exeOther):
+        for k in self.exeReqs:
+            if self.exeReqs[k] != exeOther.exeReqs[k]:
+                return False
+        return True
+
+    def __str__(self):
+        return 'ExecutionUnits: ' + str(self.exeReqs)
 
 class UArch:
 
@@ -69,7 +86,9 @@ class UArch:
         self.hwprefetcher = Prefetcher()
         self.intRegFile = RegisterFile('IntPRF')
         self.fpRegFile = RegisterFile('FpPRF')
-        self.executionUnitsBusy = ExecutionUnitsStatus()
+        self.executionUnits = ExecutionUnits()
+        self.dtlbMisses = DTLBMiss()
+        self.dcacheMisses = DCacheMiss()
 
     def __eq__(self, state):
         return self.lq == state.lq and \
@@ -77,7 +96,7 @@ class UArch:
                self.rob == state.rob and \
                self.lfb == state.lfb and \
                self.hwprefetcher == state.hwprefetcher and \
-               self.executionUnitsBusy == state.executionUnitsBusy
+               self.executionUnits == state.executionUnits
 
     def compare(self, comptype, state):
         if comptype == Component.LQ:
@@ -91,7 +110,7 @@ class UArch:
         elif comptype == Component.HWPREFETCHER:
             return self.hwprefetcher == state.hwprefetcher
         elif comptype == Component.EXESTATUS:
-            return self.executionUnitsBusy == state.executionUnitsBusy
+            return self.executionUnits == state.executionUnits
         else:
             print('Unknown uarch component type, aborting...\n')
             sys.exit()
@@ -108,7 +127,7 @@ class UArch:
         elif comptype == Component.HWPREFETCHER:
             return self.hwprefetcher.__str__()
         elif comptype == Component.EXESTATUS:
-            return self.executionUnitsBusy.__str__()
+            return self.executionUnits.__str__()
     
 
     def comp_violators(self, state):
@@ -126,7 +145,7 @@ class UArch:
                str(self.sq) + '\n' + \
                str(self.lfb) + '\n' + \
                str(self.hwprefetcher) + '\n' + \
-               str(self.executionUnitsBusy)
+               str(self.executionUnits)
 
 class LoadQueue(CircularQueue):
     def __init__(self):
@@ -188,8 +207,7 @@ class ROB(CircularQueue):
 
     def __eq__(self, robOther):
         if self.occupancy == robOther.occupancy:
-            if compareContent(self.pc, robOther.pc):
-                return compareContent(self.inst, robOther.inst)
+            return compareContent(self.pc, robOther.pc)
         return False
 
     def __str__(self):
@@ -223,16 +241,6 @@ class RegisterFile():
     def __str__(self):
         return self.name + str(self.data)
 
-class ExecutionUnitsStatus():
-    def __init__(self):
-        self.reqs = [0 for x in range(len(FunctionalUnits))]
-
-    def __eq__(self, exeStatsOther):
-        return self.reqs == exeStatsOther.reqs
-
-    def __str__(self):
-        return 'ExecutionStats: ' + str(self.reqs)
-
 class Prefetcher():
     def __init__(self):
         self.data = '' 
@@ -245,3 +253,16 @@ class Prefetcher():
 
     def __str__(self):
         return 'HWPREFETCHER: ' + str(hex(self.address)) + '\n' + str(hex(self.data))
+
+class DTLBMiss():
+    def __init__(self):
+        self.pc = []
+        self.paddr = []
+    def num_misses(self):
+        return len(self.pc)
+
+class DCacheMiss():
+    def __init__(self):
+        self.pc = []
+    def num_misses(self):
+        return len(self.pc)

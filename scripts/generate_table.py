@@ -4,9 +4,9 @@ import sys
 import re
 from Microarchitecture import *
 
-diff_regex = re.compile('logs/bearssl/([a-z]+)/100/([\.\_\-x0-9a-z]+)/sets.pickle')
+diff_regex = re.compile('logs/'+sys.argv[3]+'/'+sys.argv[2]+'/([a-z_]+)/100/([\.\_\-x0-9a-z]+)/sets.pickle')
 
-blob = os.popen('ls logs/bearssl/'+sys.argv[1]+'/100/*/sets.pickle')
+blob = os.popen('ls logs/'+sys.argv[3]+'/'+sys.argv[2]+'/'+sys.argv[1]+'/100/*/sets.pickle')
 traces = blob.readlines()
 table = open('table-'+sys.argv[1]+'.csv', 'w+')
 iters = 100
@@ -25,47 +25,70 @@ for trace in traces:
     seckeybin[keystr] = keybin
     diffs[keystr] = diff
 
-header = 'LQ-OCPNCY,LQ-PC,LQ-ADDR,SQ-OCPNY,SQ-PC,SQ-ADDR,ROB-OCPNY,ROB-PC,LFB-DATA,EUU-BITVEC,PREF-ADDR,PREF-DATA,CLASS,ITER,KEY' 
+header = 'CYCLE,'
+header += 'LQ-OCPNCY,'
+for x in range(8):
+    header += 'LQ-PC-'+str(x)+','
+for x in range(8):
+    header += 'LQ-ADDR-'+str(x)+','
+header += 'SQ-OCPNCY,'
+for x in range(8):
+    header += 'SQ-PC-'+str(x)+','
+for x in range(8):
+    header += 'SQ-ADDR-'+str(x)+','
+header += 'ROB-OCPNCY,'
+for x in range(32):
+    header += 'ROB-PC-'+str(x)+','
+for x in range(16):
+    header += 'LFB-'+str(x)+','
+for x in FunctionalUnits:
+    header += 'EUU-'+str(x.name)+','
+header += 'PREF-ADDR,CLASS,ITER,KEY,DTLB-NMISS,DCACHE-NMISS'
+
 row = ''
 table.write(header+'\n')
 for keystr in testnames:
     for loop in range(iters):
         for state in testnames[keystr][loop]:
+            row += str(state.cycle_begin) + ','
             row += str(state.lq.occupancy) + ','
             for x in range(8):
                 try: row += str(hex(state.lq.pc[x])) + ','
                 except: row += ','
-            row = row[:-1] +','
+            row = row[:-1] + ','
             for x in range(8):
                 try: row += str(hex(state.lq.address[x])) + ',' 
                 except: row += ',' 
-            row = row[:-1] +','
+            row = row[:-1] + ','
             row += str(state.sq.occupancy) + ','
             for x in range(8):
                 try: row += str(hex(state.sq.pc[x])) + ',' 
                 except: row += ',' 
-            row = row[:-1] +','
+            row = row[:-1] + ','
             for x in range(8):
                 try: row += str(hex(state.sq.address[x])) + ','
                 except: row += ',' 
-            row = row[:-1] +','
+            row = row[:-1] + ','
             row += str(state.rob.occupancy) + ','
             for x in range(32):
                 try: row += str(hex(state.rob.pc[x])) + ',' 
                 except: row += ',' 
-            row = row[:-1] +','
+            row = row[:-1] + ','
             for x in range(16):
                 try: row += str(hex(state.lfb.data[x])) + ',' 
                 except: row += ',' 
-            row = row[:-1] +','
-            for x in range(4):
-                try: row += str(state.executionUnitsBusy.reqs[x]) + ',' 
-                except: row += ',' 
-            row = row[:-1] +','
+            row = row[:-1] + ','
+            for x in FunctionalUnits:
+                try: row += str(state.executionUnits.exeReqs[x]) + ',' #one instruction in any unit in a cycle for SmallBoomConfig
+                except: row += ','
+            row = row[:-1] + ','
             row += hex(state.hwprefetcher.address) + ',' 
-            row += hex(state.hwprefetcher.data) + ','
             row += seckeybin[keystr][loop] + ','
             row += str(loop) + ','
-            row += keystr
+            row += keystr + ','
+            row += str(state.dtlbMisses.num_misses()) + ','
+            row += str(state.dcacheMisses.num_misses())
             table.write(row+'\n')
+
             row = ''
+

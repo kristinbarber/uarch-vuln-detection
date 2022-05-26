@@ -37,7 +37,14 @@ br_ccopy_v2(uint32_t ctl, void *dst, void *dummy, const void *src, size_t len)
     return;
 }
 
-/* see inner.h */
+void
+br_ccopy_v1(uint32_t ctl, void *dst, const void *src, size_t len)
+{
+        if(ctl) {
+            memmove(dst, src, len);
+        }
+        return;
+}
 void
 br_ccopy(uint32_t ctl, void *dst, const void *src, size_t len)
 {

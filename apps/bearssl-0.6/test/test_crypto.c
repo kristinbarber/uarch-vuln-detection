@@ -3220,30 +3220,6 @@ static void test_AES_small_single(char *aes_256h_key)
     memcpy(buf, plain, sizeof plain);
     memset(iv, 0, sizeof iv);
     ve->run(ec, iv, buf, sizeof buf);
-=======
-static void test_AES_big_single(char *aes_256h_key)
-{
-	  size_t u = 0;
-
-		printf("Test AES big single\n");
-		fflush(stdout);
-
-		const br_block_cbcenc_class *ve = &br_aes_big_cbcenc_vtable;
-		unsigned char key[32];
-		unsigned char plain[16];
-		unsigned char buf[16];
-		unsigned char iv[16];
-		size_t key_len;
-		br_aes_gen_cbcenc_keys v_ec;
-		const br_block_cbcenc_class **ec;
-		ec = &v_ec.vtable;
-		key_len = hextobin(key, aes_256h_key);
-		hextobin(plain, KAT_AES[u + 1]);
-		ve->init(ec, key, key_len);
-		memcpy(buf, plain, sizeof plain);
-		memset(iv, 0, sizeof iv);
-		ve->run(ec, iv, buf, sizeof buf);
->>>>>>> 9cd2990d76eb7ea2f9b7610ed0d8cade3e90dfd3:bearssl-0.6/test/test_crypto.c
 }
 
 static void
@@ -8327,12 +8303,12 @@ test_modpow_i31(void)
 }
 
 static void
-test_modpow_opt_i31_single(char* testname, unsigned char *exp, int iters)
+test_modpow_i31_single(char* testname, unsigned char *exp, int iters)
 {
     br_hmac_drbg_context hc;
     int k;
 
-    printf("Test ModPow2/i31 single: ");
+    printf("Test: %s\n", testname);
     br_hmac_drbg_init(&hc, &br_sha256_vtable, "seed modpow", 11);
 
     k = iters;
@@ -8342,9 +8318,9 @@ test_modpow_opt_i31_single(char* testname, unsigned char *exp, int iters)
     unsigned char be[128];
     unsigned mask;
     uint32_t x1[35], m1[35];
-    uint16_t x2[70], m2[70];
-    uint32_t tmp1[1000];
-    uint16_t tmp2[2000];
+    uint32_t tmp1[35];
+    uint32_t tmp2[35];
+    uint32_t tmp1_opt[1000];
 
     blen = (k + 7) >> 3;
 
@@ -8367,64 +8343,37 @@ test_modpow_opt_i31_single(char* testname, unsigned char *exp, int iters)
     br_i31_decode(m1, bm, blen);
     br_i31_decode_mod(x1, bx, blen, m1);
 
+    if (strcmp(testname, "vuln") == 0) {
+        br_i31_modpow_v1(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1, tmp2);
+        //__asm__("addi x0, x1, 0\n\t");
+        //br_i31_modpow_v1(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1, tmp2);
+    }
 
-    if (strcmp(testname, "fixedwin_ct") == 0)
-        br_i31_modpow_opt(x1, be, blen, m1, br_i31_ninv31(m1[1]),
-                            tmp1, (sizeof tmp1) / (sizeof tmp1[0]));
+    else if (strcmp(testname, "consttime") == 0) { 
+        br_i31_modpow(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1, tmp2);
+        //__asm__("addi x0, x1, 0\n\t");
+        //br_i31_modpow(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1, tmp2);
+    }    
+
+    else if (strcmp(testname, "dummy") == 0) {
+        br_i31_modpow_v2(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1, tmp2);
+         //__asm__("addi x0, x1, 0\n\t");
+        //br_i31_modpow_v2(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1, tmp2);
+    }
+    else if (strcmp(testname, "fixedwin_ct") == 0) {
+        br_i31_modpow_opt(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1_opt, (sizeof tmp1_opt) / (sizeof tmp1_opt[0]));
+        // __asm__("addi x0, x1, 0\n\t");
+       // br_i31_modpow_opt(x1, be, blen, m1, br_i31_ninv31(m1[1]), tmp1_opt, (sizeof tmp1_opt) / (sizeof tmp1_opt[0]));
+    }
+    else {
+        printf("test not supported\n");
+    }
     //else if (strcmp(testname, "fixedwin_vuln") == 0)
     //    br_i31_modpow_opt_vuln(x1, be, blen, m1, br_i31_ninv31(m1[1]),
     //         tmp1, (sizeof tmp1) / (sizeof tmp1[0]));
 
     printf(" done.\n");
     fflush(stdout);
-}
-
-static void
-test_modpow_i31_single(unsigned char *exp)
-{
-    br_hmac_drbg_context hc;
-    int k;
-
-    printf("Test ModPow/i31 single: ");
-
-    br_hmac_drbg_init(&hc, &br_sha256_vtable, "seed modpow", 11);
-
-    k = 100;
-
-    size_t blen;
-    unsigned char bm[128], bx[128], bx1[128], bx2[128];
-    unsigned char be[128];
-    unsigned mask;
-    uint32_t x1[35], m1[35];
-    uint16_t x2[70], m2[70];
-    uint32_t tmp1[1000];
-    uint32_t tmp2[1000];
-
-    memcpy(be, exp, sizeof(be));
-
-    blen = (k + 7) >> 3;
-    br_hmac_drbg_generate(&hc, bm, blen);
-    br_hmac_drbg_generate(&hc, bx, blen);
-    bm[blen - 1] |= 0x01;
-    mask = 0xFF >> ((int)(blen << 3) - k);
-    bm[0] &= mask;
-    bm[0] |= (mask - (mask >> 1));
-    bx[0] &= (mask >> 1);
-
-    printf("private key: ");
-    int i;
-    for(i = 0; i < 128; i++)
-        printf("%x", be[i]);
-    printf("\n");
-
-    br_i31_decode(m1, bm, blen);
-    br_i31_decode_mod(x1, bx, blen, m1);
-    br_i31_modpow(x1, be, blen, m1, br_i31_ninv31(m1[1]),
-                        tmp1, tmp2);
-
-    printf(" done.\n");
-    fflush(stdout);
-
 }
 
 static int
@@ -8588,38 +8537,13 @@ int main(int argc, char *argv[])
 
     str2hex(argv[2], keyval, 128);
 
-    if (strcmp(testname, "modpow") == 0) {
-    	test_modpow_i31_single(keyval);
-    }
-
-    else if (strstr(testname, "fixedwin") != NULL) {
-        test_modpow_opt_i31_single(testname, keyval, iters);
-    }
-
-    else if (strcmp(testname, "aes_big") == 0) {
+    if (strcmp(testname, "aes_small") == 0) {
         test_AES_small_single(argv[2]);
     }
 
-    else
-        printf("Test not supported\n");
-=======
-    unsigned char buffer[128];
-		char *testname = argv[1];
-    char *pos = argv[2];
-
-		if (strcmp(testname, "modpow") == 0) {
-    	for (count = 0; count < sizeof buffer/sizeof *buffer; count++) {
-        	sscanf(pos, "%2hhx", &buffer[count]);
-        	pos += 2;
-    	}
-
-    	test_modpow_opt_i31_single(buffer);
-		}
-
-		else if (strcmp(testname, "aes_big")) {
-				test_AES_big_single(pos);
-		}
->>>>>>> 9cd2990d76eb7ea2f9b7610ed0d8cade3e90dfd3:bearssl-0.6/test/test_crypto.c
+    else {
+        test_modpow_i31_single(testname, keyval, iters);
+    }
 
     return 0;
 }
