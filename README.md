@@ -23,7 +23,7 @@ The first stage is to simulate the processor-under-test, executing the selected 
 #### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
 
-We have added several tests to the BearSSL unit tests suite to (1) incorporate vulnerabilities and (2) ease use with the simulation platform.
+We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the the secret key value represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
 ### State Construction
