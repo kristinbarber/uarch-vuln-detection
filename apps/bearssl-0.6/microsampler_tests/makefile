@@ -1,4 +1,5 @@
 CC=riscv64-unknown-linux-gnu-gcc
+OBJDUMP=riscv64-unknown-linux-gnu-objdump
 CFLAGS=-Os --static -I../src -I../inc
 BDIR=build
 SDIR=src
@@ -10,6 +11,7 @@ BIN = $(patsubst %,$(BDIR)/%,$(_BIN))
 
 $(BDIR)/%: $(SDIR)/%.c
 	$(CC) -o $@ $< $(CFLAGS) $(SOURCES)
+	$(OBJDUMP) -d $@ > $@.dump
 
 all: $(BIN)
 

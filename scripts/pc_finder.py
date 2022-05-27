@@ -3,9 +3,9 @@ import re
 
 """
 arg1: objdump of application binary
-arg2: func1, br_i31_modpow [v1, v2]
+arg2: func1, br_i31_modpow [_v1, _v2] + [_fence]
 arg3: func2, br_ccopy [v1, v2]
-arg4 (optional): does this app have a warmup period? (warmup) 
+arg4: [warmup]? 
 
 """
 
@@ -40,6 +40,7 @@ for line in fin:
                     addr = re.search(jmpAddrRegex, operands).group(1)
                     pc_lst.append(addr)
                     pc_lst.append(hex(int(pc, 16) + 4)[2:])
+                    break
 
 print(' '.join(['0x00000' + s for s in pc_lst]))
 
