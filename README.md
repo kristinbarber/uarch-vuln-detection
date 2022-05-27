@@ -23,10 +23,8 @@ The first stage is to simulate the processor-under-test, executing the selected 
 #### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
 
-We have added several tests to the BearSSL unit tests suite to (1) incorporate vulnerabilities and (2) ease use with the simulation platform.
-The unit tests are held in the file <code>test/test_crpyto.c</code> and is compiled into the binary <code>build/testcrypto</code>. This application takes as input the testname you would like to run, as well as the secret key to be used for the given run. The key is represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (1024-bit for RSA (modpow), 128-bit for AES).
-
-7. Run <code>make CONF=riscv tests</code> to compile the test binary.
+We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
+The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
 ### State Construction
 ### Metric Calculation and Statistics Reporting
