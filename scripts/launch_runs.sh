@@ -9,9 +9,10 @@ keys=('0xaa' '0x44' 'rand-0.10_0.90' 'rand-0.20_0.80' 'rand-0.30_0.70' 'rand-0.4
 #keys=('rand-0.70_0.30' 'rand-0.70_0.30.v1' 'rand-0.70_0.30.v2' 'rand-0.70_0.30.v3' 'rand-0.70_0.30.v4' 'rand-0.70_0.30.v5' 'rand-0.70_0.30.v6' 'rand-0.70_0.30.v7' 'rand-0.70_0.30.v8' 'rand-0.70_0.30.v9')
 #'rand-0.80_0.20' 'rand-0.80_0.20.v1' 'rand-0.80_0.20.v2' 'rand-0.80_0.20.v3' 'rand-0.80_0.20.v4' 'rand-0.80_0.20.v5' 'rand-0.80_0.20.v6' 'rand-0.80_0.20.v7' 'rand-0.80_0.20.v8' 'rand-0.80_0.20.v9'
 #'rand-0.90_0.10' 'rand-0.90_0.10.v1' 'rand-0.90_0.10.v2' 'rand-0.90_0.10.v3' 'rand-0.90_0.10.v4' 'rand-0.90_0.10.v5' 'rand-0.90_0.10.v6' 'rand-0.90_0.10.v7' 'rand-0.90_0.10.v8' 'rand-0.90_0.10.v9' 
-
+action='stats'
+mode='local'
 suite='bearssl'
-apps=('vuln' 'dummy' 'consttime')
+apps=('v1' 'v2' 'v3')
 
 snode=4
 
@@ -27,6 +28,11 @@ iters=100
 echo "#####################"
 while [ "$1" != '' ]; do
 	case $1 in
+		-action )
+			shift
+			action=$1
+			echo "action: "$action
+			;;
                 -mode )
                         shift
                         mode=$1
@@ -76,12 +82,16 @@ echo "#####################"
 
 node=$snode
 
-if [ "$mode" == "kill" ]; then
+if [ "$action" == "kill" ]; then
         echo "Killing all processes..."
         while [ "$node" -lt 13 ]; do
                 echo "node $node"
                 command="pkill -u barberk"
-                sshpass -p "pleasechangethispasswordasap" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+                if [ "$mode" == "ssh" ]; then
+ 			sshpass -p "pleasechangethispasswordasap" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+		elif [ "$mode" == "dryrun" ]; then
+			echo $command
+		fi
                 let node++
                 until [[ ! " ${excluded_nodes[@]} " =~ " ${node} " ]]
                 do
@@ -104,12 +114,10 @@ do
 			node=$snode
 		fi
 	
-		command="cd $SIM_ROOT/uarch-leakage-detection; "
-		if [ "$mode" == "simulate" ] || [ "$mode" == "all" ]; then
+		if [ "$action" == "simulate" ]; then
 			command+="mkdir -p logs/"$design"/"$suite"/"$app"/"$iters"/"$key"; nohup ./scripts/do_simulation.sh "$key" "$suite" "$app" "$iters" "$design" > logs/"$design"/"$suite"/"$app"/"$iters"/"$key"/launch_simulation.log 2>&1 &"
-		fi
 		
-		if [ "$mode" == "parse" ] || [ "$mode" == "all" ]; then
+		elif [ "$action" == "parse" ]; then
 			command+="nohup ./scripts/do_parse.sh "$key 
 			if [ "$suite" == "microbench" ] && [ "$app" == "bad_ccopy_bare" ]; then
 				command+=" 0x00800000ce 0x00800001e2 0x008000013e 0x0080000142 0x00800001d4 "
@@ -121,11 +129,11 @@ do
 				command+=" 0x0080000126 0x0080000146 0x008000020c 0x0080000160 0x0080000210 "
 			elif [ "$suite" == "microbench" ] && [ "$app" == "ct_ccopy_bare_double_fence" ]; then
 				command+=" 0x0080000126 0x0080000146 0x0080000210 0x0080000160 0x0080000214 "
-                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "vuln_warmup" ]; then
+                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_warmup" ]; then
 				command+=" 0x00000103a0 0x00000103a4 0x00000108a4 0x00000104d6 0x00000108a8 "
-                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "vuln" ]; then
+                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1" ]; then
    				command+=" 0x000001037e 0x0000010382 0x0000010884 0x00000104b6 0x0000010888 "
-                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "vuln_fence" ]; then
+                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_fence" ]; then
 				command+=" 0x000001037e 0x0000010382 0x0000010956 0x00000104b6 0x000001095a "
                 	elif [ "$suite" == "bearssl_comb" ] && [ "$app" == "vuln_warmup" ]; then
    				command+=" 0x0000010726 0x000001072a 0x0000012218 0x0000012fcc 0x000001221c "
@@ -133,17 +141,17 @@ do
 				command+=" 0x00000106e8 0x00000106ec 0x000001215c 0x0000012f10 0x0000012160 "  
                 	elif [ "$suite" == "bearssl_single" ] && [ "$app" == "vuln" ]; then
 				command+=" 0x00000105a4 0x00000105a8 0x0000011e1c 0x0000012318 0x0000011e20 " 
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "consttime" ]; then
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3" ]; then
    				command+=" 0x000001037e 0x0000010382 0x00000107b6 0x00000104c6 0x00000107ba "
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "consttime_warmup" ]; then
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3e_warmup" ]; then
 				command+=" 0x00000103a0 0x00000103a4 0x00000107d6 0x00000104e6 0x00000107da "
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "consttime_fence" ]; then
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3_fence" ]; then
 				command+=" 0x000001037e 0x0000010382 0x000001088a 0x00000104c6 0x000001088e "  
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "dummy_warmup" ]; then
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2_warmup" ]; then
 				command+=" 0x00000103a8 0x00000103ac 0x0000010a58 0x00000104c8 0x0000010a5c "
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "dummy" ]; then
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2" ]; then
 				command+=" 0x0000010382 0x0000010386 0x0000010a34 0x00000104a4 0x0000010a38 "
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "dummy_fence" ]; then
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2_fence" ]; then
 				command+=" 0x0000010382 0x0000010386 0x0000010b10 0x00000104a4 0x0000010b14 " 
                 	elif [ "$suite" == "bearssl_comb" ] && [ "$app" == "dummy" ]; then
 				command+=" 0x00000107bc 0x00000107c0 0x000001222c 0x0000012efa 0x0000012230 "
@@ -151,18 +159,23 @@ do
 				command+=" 0x00000105a4 0x00000105a8 0x0000011e1e 0x000001231a 0x0000011e22 "
                         elif [ "$app" == "fixedwin_ct" ]; then
                                 command+=" 0x0000010864 0x0000010756 0x0000012532 0x0000012534 0x0000012540 "
-                       fi
+			fi
 
 			command+=$suite" "$app" "$iters" "$design" > logs/"$design"/"$suite"/"$app"/"$iters"/"$key"/launch_parse.log 2>&1 &"
-		fi
 
-		if [ "$mode" == "stats" ] || [ "$mode" == "all" ]; then
+		elif [ "$action" == "stats" ]; then
 			command+="nohup ./scripts/do_stats.sh "$key" "$suite" "$app" "$phi" "$alpha" "$window" "$iters" "$design" > logs/"$design"/"$suite"/"$app"/"$iters"/"$key"/launch_stats.log 2>&1 &"
 		fi
 
-		echo "Launching "$design":"$app":"$key" on arch"$node""
-		#echo $command
-		sshpass -p "pleasechangethispasswordasap" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+		if [ "$mode" == "ssh" ]; then
+			echo "Launching "$design":"$app":"$key" on arch"$node""
+			sshpass -p "pleasechangethispasswordasap" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+		elif [ "$mode" == "dryrun" ]; then
+			echo "Launching "$design":"$app":"$key""
+			echo $command
+		elif [ "$mode" == "local" ]; then
+			exec $command
+		fi
 
 	done
 done
