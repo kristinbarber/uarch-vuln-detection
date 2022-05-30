@@ -1,5 +1,5 @@
-CC=riscv64-unknown-linux-gnu-gcc
-OBJDUMP=riscv64-unknown-linux-gnu-objdump
+CC=riscv64-unknown-elf-gcc
+OBJDUMP=riscv64-unknown-elf-objdump
 CFLAGS=-Os --static -I../src -I../inc
 BDIR=build
 SDIR=src
