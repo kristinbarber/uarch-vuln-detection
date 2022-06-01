@@ -24,12 +24,12 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 ### Steps
 
 1. Launch runs with the procedure outlined above. Select suite, applications, keys and designs using script parameters. Most parameters can be passed multiple values, setting off simulations of all permutations. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
-2. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py.</code>
+2. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Tables for each application,keys will be generated from this pair. An example:
+   > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
     
 ### Debugging
 There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs). It takes SCR function names/labels as input.
 Also, <code>inspect_instructions.py</code> can be helpful in an interactive python session to search the list of instructions fed into the pipeline and view the timestamps for which an instruction occupied various pipeline stages. If no timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
-
 
 ## Simulation
 
