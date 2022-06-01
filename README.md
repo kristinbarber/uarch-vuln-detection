@@ -5,6 +5,24 @@ The RISC-V BOOM processor released with the Chipyard framework from UC Berkeley 
 
 The tool has three stages: simulation, parsing and calculation of vulnerability metrics.
 
+## Quick Start
+
+The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware design. This scripts calls <code>do_simulation.sh<code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>. The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some exmaples of its use:
+
+1.  <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code> 
+    This will launch a simulation of the v2 application for using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>.
+2.  <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code>
+    This will launch a simulation only for the 0xaa input
+3.  ./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**
+    Print the command that will be issued to the remote node over SSH, instead of running it
+4. Replace **-action** with parse, stats to complete the analysis.
+5. Create CSV files to be feed into ML models using <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py<script>.
+    
+### Debugging
+There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs) by supplying thier function names/labels.
+Also, <code>inspect_instructions.py</code> can be run interactively in python to search through the list of instructions fed into the pipeline and shows the timestamps for that an instruction occupied various pipeline stages. If not timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
+
+
 ### Simulation
 
 #### Processor Simulator
