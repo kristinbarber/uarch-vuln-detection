@@ -7,7 +7,7 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
-The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware design. This scripts calls <code>do_simulation.sh<code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>. The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some exmaples of its use:
+The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware design. This scripts calls <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>. The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some exmaples of its use:
 
 1.  <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code> 
     This will launch a simulation of the v2 application for using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>.
