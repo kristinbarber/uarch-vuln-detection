@@ -7,17 +7,24 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
-The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware design. This scripts calls <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>. The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some examples of its use:
+The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware designs. This script calls <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>.  
+The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some examples of its use:  
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>    
 
-Ex1) <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>   
-    This will launch seperate simulations of the v2 application using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>.  
-Ex2) <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code>   
-    This will launch a simulation only for the 0xaa input  
-Ex3) <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code>     
-    Print the command that will be issued to the remote node over SSH, instead of running it  
-    
-1. Run this script with the same parameters replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
-2. To create CSV files to be feed into ML models use <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py<script>.</code>
+This will launch seperate simulations of the v2 application using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>
+
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code> 
+   
+This will launch a simulation only for the 0xaa input   
+
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code> 
+
+Print the command that will be issued to the remote node over SSH, instead of running it   
+
+### Steps
+
+1. Launch runs with the procedure outlined above. Select suite, applications, keys and designs using script parameters. Most parameters can be passed multiple values, setting off simulations of all permutations. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
+2. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py.</code>
     
 ### Debugging
 There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs). It takes SCR function names/labels as input.
