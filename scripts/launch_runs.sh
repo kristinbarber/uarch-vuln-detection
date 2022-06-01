@@ -1,5 +1,6 @@
 #SET THESE VARIABLES.
 PASSWD=''
+USER=''
 
 
 keys=('0xaa' '0x44' 'rand-0.10_0.90' 'rand-0.20_0.80' 'rand-0.30_0.70' 'rand-0.40_0.60' 'rand-0.50_0.50' 'rand-0.60_0.40' 'rand-0.70_0.30' 'rand-0.80_0.20' 'rand-0.90_0.10') 
@@ -90,9 +91,9 @@ if [ "$action" == "kill" ]; then
         echo "Killing all processes..."
         while [ "$node" -lt 13 ]; do
                 echo "node $node"
-                command="pkill -u barberk"
+                command="pkill -u "$USER
                 if [ "$mode" == "ssh" ]; then
- 			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+ 			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo $command
 		fi
@@ -173,7 +174,7 @@ do
 
 		if [ "$mode" == "ssh" ]; then
 			echo "Launching "$design":"$app":"$key" on arch"$node""
-			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo "Launching "$design":"$app":"$key""
 			echo $command
