@@ -16,7 +16,7 @@ The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a lo
 3.  ./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**
     Print the command that will be issued to the remote node over SSH, instead of running it
 4. Replace **-action** with parse, stats to complete the analysis.
-5. Create CSV files to be feed into ML models using <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py<script>.
+5. Create CSV files to be feed into ML models using <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py<script>.</code>
     
 ### Debugging
 There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs) by supplying thier function names/labels.
