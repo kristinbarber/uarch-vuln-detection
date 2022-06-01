@@ -23,7 +23,7 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 
 ### Steps
 
-1. Launch runs with the procedure outlined above. Select suite, design application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
+1. Launch runs with the procedure outlined above. Select suite, design, application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
 2. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Tables for each application,keys will be generated from this pair. An example:
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
     
