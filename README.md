@@ -13,9 +13,9 @@ The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a lo
     This will launch a simulation of the v2 application for using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>.
 2.  <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code>
     This will launch a simulation only for the 0xaa input
-3.  ./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**
+3.  <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code>
     Print the command that will be issued to the remote node over SSH, instead of running it
-4. Replace **-action** with parse, stats to complete the analysis.
+4. Replace <code>**-action**</code> with <code>parse</code>, <code>stats</code> to complete the analysis.
 5. Create CSV files to be feed into ML models using <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py<script>.</code>
     
 ### Debugging
@@ -23,9 +23,9 @@ There are other tools available to help with debugging and quickly finding infor
 Also, <code>inspect_instructions.py</code> can be run interactively in python to search through the list of instructions fed into the pipeline and shows the timestamps for that an instruction occupied various pipeline stages. If not timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
 
 
-### Simulation
+## Simulation
 
-#### Processor Simulator
+### Processor Simulator
 The first stage is to simulate the processor-under-test, executing the selected application. We use the Verilator backend, which is a cycle-accurate C++ model of the hardware.
 
 1. Clone the Chipyard repository from Github: <code>git clone https://github.com/ucb-bar/chipyard.git</code>
@@ -38,15 +38,14 @@ The first stage is to simulate the processor-under-test, executing the selected 
 6. Change to the <code>sims/verilator</code> directory
     1. Run <code>CONFIG=SmallBoomConfig</code>, this command will generate the simulator executable
 
-#### Applications
+### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
 
 We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
-### State Construction
-### Metric Calculation and Statistics Reporting
+## State Construction
+    
+## Metric Calculation and Statistics Reporting
 
 ## Software Modules
-
-The minimally modified version of the RISC-V BOOM core must be 
