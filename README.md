@@ -7,21 +7,21 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
-The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware design. This scripts calls <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>. The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some exmaples of its use:
+The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware design. This scripts calls <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>. The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some examples of its use:
 
-Ex. 1. <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>   
-    This will launch a simulation of the v2 application for using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>.
-Ex. 2. <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code>  
-    This will launch a simulation only for the 0xaa input
-Ex. 3. <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code>    
-    Print the command that will be issued to the remote node over SSH, instead of running it
+1. <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>   
+    This will launch seperate simulations of the v2 application using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>.  
+2. <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code>   
+    This will launch a simulation only for the 0xaa input  
+3. <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code>    
+    Print the command that will be issued to the remote node over SSH, instead of running it  
     
-Replace <code>**-action**</code> with <code>parse</code>, <code>stats</code> to complete the analysis.  
+Run this script with the same parameters replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
 To create CSV files to be feed into ML models use <code>scripts/generate_all_tables.sh</code>, which calls <code>scripts/generate_table.py<script>.</code>
     
 ### Debugging
-There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs) by supplying thier function names/labels.
-Also, <code>inspect_instructions.py</code> can be run interactively in python to search through the list of instructions fed into the pipeline and shows the timestamps for that an instruction occupied various pipeline stages. If not timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
+There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs). It takes SCR function names/labels as input.
+Also, <code>inspect_instructions.py</code> can be helpful in an interactive python session to search the list of instructions fed into the pipeline and view the timestamps for which an instruction occupied various pipeline stages. If no timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
 
 
 ## Simulation
