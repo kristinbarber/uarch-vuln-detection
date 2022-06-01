@@ -30,6 +30,9 @@ design="baseline"
 
 iters=100
 
+
+command="cd $PWD; "
+
 echo "#####################"
 while [ "$1" != '' ]; do
 	case $1 in
