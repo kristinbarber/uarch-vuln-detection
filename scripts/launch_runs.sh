@@ -1,3 +1,7 @@
+#SET THESE VARIABLES.
+PASSWD=''
+
+
 keys=('0xaa' '0x44' 'rand-0.10_0.90' 'rand-0.20_0.80' 'rand-0.30_0.70' 'rand-0.40_0.60' 'rand-0.50_0.50' 'rand-0.60_0.40' 'rand-0.70_0.30' 'rand-0.80_0.20' 'rand-0.90_0.10') 
 #keys=('window-4bit-v1' 'window-4bit-v2' 'window-4bit-v3' 'window-4bit-v4' 'window-4bit-v5' 'window-4bit-v6' 'window-4bit-v7' 'window-4bit-v8' 'window-4bit-v9' 'window-4bit-v10')
 #'rand-0.10_0.90' 'rand-0.10_0.90.v1' 'rand-0.10_0.90.v2' 'rand-0.10_0.90.v3' 'rand-0.10_0.90.v4' 'rand-0.10_0.90.v5' 'rand-0.10_0.90.v6' 'rand-0.10_0.90.v7' 'rand-0.10_0.90.v8' 'rand-0.10_0.90.v9'
@@ -88,7 +92,7 @@ if [ "$action" == "kill" ]; then
                 echo "node $node"
                 command="pkill -u barberk"
                 if [ "$mode" == "ssh" ]; then
- 			sshpass -p "pleasechangethispasswordasap" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+ 			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo $command
 		fi
@@ -169,7 +173,7 @@ do
 
 		if [ "$mode" == "ssh" ]; then
 			echo "Launching "$design":"$app":"$key" on arch"$node""
-			sshpass -p "pleasechangethispasswordasap" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
+			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no barberk@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo "Launching "$design":"$app":"$key""
 			echo $command
