@@ -5,9 +5,35 @@ The RISC-V BOOM processor released with the Chipyard framework from UC Berkeley 
 
 The tool has three stages: simulation, parsing and calculation of vulnerability metrics.
 
-### Simulation
+## Quick Start
 
-#### Processor Simulator
+The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes with SSH for the same application with different inputs (keys) and hardware designs. This script calls <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code>.  
+The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some examples of its use:  
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>    
+
+This will launch seperate simulations of the v2 application using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>
+
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code> 
+   
+This will launch a simulation only for the 0xaa input   
+
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code> 
+
+Print the command that will be issued to the remote node over SSH, instead of running it   
+
+### Steps
+
+1. Launch runs with the procedure outlined above. Select suite, design application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
+2. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Tables for each application,keys will be generated from this pair. An example:
+   > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
+    
+### Debugging
+There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs). It takes SCR function names/labels as input.
+Also, <code>inspect_instructions.py</code> can be helpful in an interactive python session to search the list of instructions fed into the pipeline and view the timestamps for which an instruction occupied various pipeline stages. If no timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
+
+## Simulation
+
+### Processor Simulator
 The first stage is to simulate the processor-under-test, executing the selected application. We use the Verilator backend, which is a cycle-accurate C++ model of the hardware.
 
 1. Clone the Chipyard repository from Github: <code>git clone https://github.com/ucb-bar/chipyard.git</code>
@@ -20,15 +46,14 @@ The first stage is to simulate the processor-under-test, executing the selected 
 6. Change to the <code>sims/verilator</code> directory
     1. Run <code>CONFIG=SmallBoomConfig</code>, this command will generate the simulator executable
 
-#### Applications
+### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
 
 We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
-### State Construction
-### Metric Calculation and Statistics Reporting
+## State Construction
+    
+## Metric Calculation and Statistics Reporting
 
 ## Software Modules
-
-The minimally modified version of the RISC-V BOOM core must be 
