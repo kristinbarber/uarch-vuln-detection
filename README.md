@@ -15,13 +15,13 @@ The script should be called three times to launch the simulation, parsing and st
 
 This will launch seperate simulations of the v2 application using each available key as input, defined in the <code>keys</code> array of <code>launch_runs.sh</code>
 
-> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 **-keysi 0xaa** -design baseline -mode ssh</code> 
+> <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic  **-appsi "v1 v2 v3"**  **-keysi 0xaa** -design baseline -mode ssh</code> 
    
-This will launch a simulation only for the 0xaa input   
+This will launch a simulation only for the 0xaa input, for three applications (v1, v2 & v3)
 
 > <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline **-mode dryrun**</code> 
 
-Print the command that will be issued to the remote node over SSH, instead of running it   
+Print the command that will be issued to the remote node over SSH, instead of running it
 
 ### General Steps
 
