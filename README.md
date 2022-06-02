@@ -57,7 +57,7 @@ The first stage is to simulate the processor-under-test, executing the selected 
     1. Open .gitmodules from the root directory of Chipyard
     2. Under <code>[submodule "generators/boom"]</code>, change to <code>url = https://github.com/kristinbarber/riscv-boom.git</code>
 4. Follow instructions for repository initialization from Chipyard documentation
-5. Checkout 'kmb' branch: <code>git checkout baseline</code>
+5. Checkout branch for the baseline design with Microsampler tracing: <code>git checkout baseline</code>
 6. Change to the <code>sims/verilator</code> directory
     1. Run <code>CONFIG=SmallBoomConfig</code>, this command will generate the simulator executable
 
