@@ -1,6 +1,6 @@
 #SET THESE VARIABLES.
-PASSWD=''
-USER=''
+PASSWD='pleasechangethispasswordasap'
+USER='barberk'
 
 
 keys=('0xaa' '0x44' 'rand-0.10_0.90' 'rand-0.20_0.80' 'rand-0.30_0.70' 'rand-0.40_0.60' 'rand-0.50_0.50' 'rand-0.60_0.40' 'rand-0.70_0.30' 'rand-0.80_0.20' 'rand-0.90_0.10') 
@@ -29,9 +29,6 @@ window="1"
 design="baseline"
 
 iters=100
-
-
-command="cd $PWD; "
 
 echo "#####################"
 while [ "$1" != '' ]; do
@@ -89,6 +86,7 @@ done
 echo "#####################"
 
 node=$snode
+command=""
 
 if [ "$action" == "kill" ]; then
         echo "Killing all processes..."
@@ -96,7 +94,7 @@ if [ "$action" == "kill" ]; then
                 echo "node $node"
                 command="pkill -u "$USER
                 if [ "$mode" == "ssh" ]; then
- 			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
+ 			sshpass -p "$PASSWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo $command
 		fi
@@ -108,6 +106,8 @@ if [ "$action" == "kill" ]; then
         done
         exit 1
 fi
+
+command+="cd "$PWD"; "
 
 for app in "${apps[@]}"
 do
@@ -127,46 +127,24 @@ do
 		
 		elif [ "$action" == "parse" ]; then
 			command+="nohup ./scripts/do_parse.sh "$key 
-			if [ "$suite" == "microbench" ] && [ "$app" == "bad_ccopy_bare" ]; then
-				command+=" 0x00800000ce 0x00800001e2 0x008000013e 0x0080000142 0x00800001d4 "
-			elif [ "$suite" == "microbench" ] && [ "$app" == "ct_ccopy_bare" ]; then
-				command+=" 0x008000010e 0x0080000124 0x0080000196 0x0080000130 0x008000019a "
-			elif [ "$suite" == "microbench" ] && [ "$app" == "ct_ccopy_bare_nops" ]; then
-				command+=" 0x0080000126 0x0080000146 0x0080000208 0x0080000160 0x008000020c "
-			elif [ "$suite" == "microbench" ] && [ "$app" == "ct_ccopy_bare_nops_fence" ]; then
-				command+=" 0x0080000126 0x0080000146 0x008000020c 0x0080000160 0x0080000210 "
-			elif [ "$suite" == "microbench" ] && [ "$app" == "ct_ccopy_bare_double_fence" ]; then
-				command+=" 0x0080000126 0x0080000146 0x0080000210 0x0080000160 0x0080000214 "
-                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_warmup" ]; then
-				command+=" 0x00000103a0 0x00000103a4 0x00000108a4 0x00000104d6 0x00000108a8 "
+                	if [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_warmup" ]; then
+				command+=" 0x000001014a 0x000001014e 0x00000106f4 0x000001024e 0x00000106f8 "
                 	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1" ]; then
    				command+=" 0x000001037e 0x0000010382 0x0000010884 0x00000104b6 0x0000010888 "
                 	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_fence" ]; then
-				command+=" 0x000001037e 0x0000010382 0x0000010956 0x00000104b6 0x000001095a "
-                	elif [ "$suite" == "bearssl_comb" ] && [ "$app" == "vuln_warmup" ]; then
-   				command+=" 0x0000010726 0x000001072a 0x0000012218 0x0000012fcc 0x000001221c "
-                	elif [ "$suite" == "bearssl_comb" ] && [ "$app" == "vuln" ]; then
-				command+=" 0x00000106e8 0x00000106ec 0x000001215c 0x0000012f10 0x0000012160 "  
-                	elif [ "$suite" == "bearssl_single" ] && [ "$app" == "vuln" ]; then
-				command+=" 0x00000105a4 0x00000105a8 0x0000011e1c 0x0000012318 0x0000011e20 " 
+				command+=" 0x0000010128 0x000001012c 0x00000106d2 0x000001022c 0x00000106d6 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3" ]; then
-   				command+=" 0x000001037e 0x0000010382 0x00000107b6 0x00000104c6 0x00000107ba "
-			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3e_warmup" ]; then
-				command+=" 0x00000103a0 0x00000103a4 0x00000107d6 0x00000104e6 0x00000107da "
+   				command+=" 0x0000010128 0x000001012c 0x000001052e 0x000001023c 0x0000010532 "
+			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3_warmup" ]; then
+				command+=" 0x000001014a 0x000001014e 0x0000010550 0x000001025e 0x0000010554 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3_fence" ]; then
-				command+=" 0x000001037e 0x0000010382 0x000001088a 0x00000104c6 0x000001088e "  
+				command+=" 0x0000010128 0x000001012c 0x000001052e 0x000001023c 0x0000010532 "  
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2_warmup" ]; then
-				command+=" 0x00000103a8 0x00000103ac 0x0000010a58 0x00000104c8 0x0000010a5c "
+				command+=" 0x0000010152 0x0000010156 0x00000108a8 0x0000010240 0x00000108ac "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2" ]; then
-				command+=" 0x0000010382 0x0000010386 0x0000010a34 0x00000104a4 0x0000010a38 "
+				command+=" 0x000001012c 0x0000010130 0x0000010882 0x000001021a 0x0000010886 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2_fence" ]; then
-				command+=" 0x0000010382 0x0000010386 0x0000010b10 0x00000104a4 0x0000010b14 " 
-                	elif [ "$suite" == "bearssl_comb" ] && [ "$app" == "dummy" ]; then
-				command+=" 0x00000107bc 0x00000107c0 0x000001222c 0x0000012efa 0x0000012230 "
-                	elif [ "$suite" == "bearssl_single" ] && [ "$app" == "dummy" ]; then
-				command+=" 0x00000105a4 0x00000105a8 0x0000011e1e 0x000001231a 0x0000011e22 "
-                        elif [ "$app" == "fixedwin_ct" ]; then
-                                command+=" 0x0000010864 0x0000010756 0x0000012532 0x0000012534 0x0000012540 "
+				command+=" 0x000001012c 0x0000010130 0x0000010882 0x000001021a 0x0000010886 " 
 			fi
 
 			command+=$suite" "$app" "$iters" "$design" > logs/"$design"/"$suite"/"$app"/"$iters"/"$key"/launch_parse.log 2>&1 &"
@@ -177,7 +155,7 @@ do
 
 		if [ "$mode" == "ssh" ]; then
 			echo "Launching "$design":"$app":"$key" on arch"$node""
-			sshpass -p "$PWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
+			sshpass -p "$PASSWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo "Launching "$design":"$app":"$key""
 			echo $command
