@@ -27,7 +27,7 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 
 1. Set <code>SIM_ROOT</code> environment variable to point to the root directory of this repository
 2. Set USER and PASSWD fields in launcher script
-3. Launch runs with the procedure outlined above. Select suite, design, application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  
+3. Launch runs with the procedure outlined above. Select suite, design, application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  The statistics reporting done corresponds to the analysis described in our Computer Architecture Letters publication, [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications].
 4. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Tables for each application,keys will be generated from this pair. An example:
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
 
@@ -72,3 +72,5 @@ The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</cod
 ## Metric Calculation and Statistics Reporting
 
 ## Software Modules
+
+[A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications]: https://ieeexplore.ieee.org/document/9713708
