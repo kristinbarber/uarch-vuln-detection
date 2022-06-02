@@ -7,6 +7,8 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
+Run <code>make</code> in <code>apps/bearssl-0.6/microsampler_tests</code> to compile all the tests.
+
 The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes using SSH of the same application, selecting different inputs (keys) and hardware designs. This script is simply a helper-wrapper which then executes <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code> followed by <code>parser.py</code> and <code>stats.py</code>, respectively.
 The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some examples of its use:  
 > <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>    
@@ -30,11 +32,12 @@ Print the command that will be issued to the remote node over SSH, instead of ru
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
 
 ### Adding a Test
-1. Add an application test by first compiling the test with the riscv cross-compiler toolchain (within Chipyard install)
-2. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
-3. Make note of program counter values asscoiated with the starting and ending points of these regions
-4. Enter PC values into launcher script, these are consulted during state sample creation
-   a. There are five PC values which need to be entered: (1) state sample record begin, (2) state sample record end, (3) caller of SCR, (4) callee to SCR (5) return from SCR
+1. Add an application test by first compiling it with the riscv cross-compiler toolchain (within Chipyard install)
+    1. Taking a look at the Makefile under <code>apps/bearssl-0.6/microsampler_tests</code> for examples
+3. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
+4. Make note of program counter values asscoiated with the starting and ending points of these regions
+5. Enter PC values into launcher script, these are consulted during state sample creation
+    1. There are five PC values which need to be entered: (a) state sample record begin, (b) state sample record end, (c) caller of SCR, (d) SCR callee, (e) SCR return
    
 ### Adding a Key
 To execute tests using a new key, a plain-text file must be created under <code>scripts/keys/</code> with the value of the key in hexidecimal. This is used to pass the key to the simulator.
