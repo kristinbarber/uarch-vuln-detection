@@ -35,7 +35,7 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 1. Add an application test by first compiling it with the riscv cross-compiler toolchain (within Chipyard install)
     1. Taking a look at the Makefile under <code>apps/bearssl-0.6/microsampler_tests</code> for examples
 3. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
-4. Make note of program counter values asscoiated with the starting and ending points of these regions
+4. Make note of program counter values associated with the starting and ending points of these regions
 5. Enter PC values into launcher script, these are consulted during state sample creation
     1. There are five PC values which need to be entered: (a) state sample record begin, (b) state sample record end, (c) caller of SCR, (d) SCR callee, (e) SCR return
    
