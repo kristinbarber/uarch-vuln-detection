@@ -4,11 +4,11 @@ import sys
 import re
 from Microarchitecture import *
 
-diff_regex = re.compile('logs/'+sys.argv[3]+'/'+sys.argv[2]+'/([a-z_]+)/100/([\.\_\-x0-9a-z]+)/sets.pickle')
+diff_regex = re.compile('logs/'+sys.argv[3]+'/'+sys.argv[2]+'/([0-9a-z_]+)/100/([\.\_\-x0-9a-z]+)/sets.pickle')
 
 blob = os.popen('ls logs/'+sys.argv[3]+'/'+sys.argv[2]+'/'+sys.argv[1]+'/100/*/sets.pickle')
 traces = blob.readlines()
-table = open('table-'+sys.argv[1]+'.csv', 'w+')
+table = open('data/table-'+sys.argv[1]+'.csv', 'w+')
 iters = 100
 
 diffs = {}

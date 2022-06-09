@@ -1,6 +1,6 @@
 #SET THESE VARIABLES.
-PASSWD=''
-USER=''
+PASSWD='pleasechangethispasswordasap'
+USER='barberk'
 
 
 keys=('0xaa' '0x44' 'rand-0.10_0.90' 'rand-0.20_0.80' 'rand-0.30_0.70' 'rand-0.40_0.60' 'rand-0.50_0.50' 'rand-0.60_0.40' 'rand-0.70_0.30' 'rand-0.80_0.20' 'rand-0.90_0.10') 
@@ -107,8 +107,6 @@ if [ "$action" == "kill" ]; then
         exit 1
 fi
 
-command+="cd "$PWD"; "
-
 for app in "${apps[@]}"
 do
 	for key in "${keys[@]}"
@@ -121,6 +119,8 @@ do
 		if [ "$node" -gt 12 ]; then
 			node=$snode
 		fi
+
+		command+="cd "$PWD"; "
 	
 		if [ "$action" == "simulate" ]; then
 			command+="mkdir -p logs/"$design"/"$suite"/"$app"/"$iters"/"$key"; nohup ./scripts/do_simulation.sh "$key" "$suite" "$app" "$iters" "$design" > logs/"$design"/"$suite"/"$app"/"$iters"/"$key"/launch_simulation.log 2>&1 &"
@@ -132,19 +132,19 @@ do
                 	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_warmup" ]; then
 				command+=" 0x000001014a 0x000001014e 0x00000106f4 0x000001024e 0x00000106f8 "
                 	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_fence" ]; then
-				command+=" 0x0000010128 0x000001012c 0x00000106d2 0x000001022c 0x00000106d6 "
+				command+=" 0x0000010128 0x000001012c 0x00000107a4 0x000001022c 0x00000107a8 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2" ]; then
 				command+=" 0x000001012c 0x0000010130 0x0000010882 0x000001021a 0x0000010886 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2_warmup" ]; then
 				command+=" 0x0000010152 0x0000010156 0x00000108a8 0x0000010240 0x00000108ac "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v2_fence" ]; then
-				command+=" 0x000001012c 0x0000010130 0x0000010882 0x000001021a 0x0000010886 "
+				command+=" 0x000001012c 0x0000010130 0x000001095c 0x000001021a 0x0000010960 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3" ]; then
 				command+=" 0x0000010128 0x000001012c 0x000001052e 0x000001023c 0x0000010532 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3_warmup" ]; then
 				command+=" 0x000001014a 0x000001014e 0x0000010550 0x000001025e 0x0000010554 "
 			elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v3_fence" ]; then
-				command+=" 0x0000010128 0x000001012c 0x000001052e 0x000001023c 0x0000010532 "
+				command+=" 0x0000010128 0x000001012c 0x0000010600 0x000001023c 0x0000010604 "
 			fi
 
 			command+=$suite" "$app" "$iters" "$design" > logs/"$design"/"$suite"/"$app"/"$iters"/"$key"/launch_parse.log 2>&1 &"
@@ -163,5 +163,6 @@ do
 			exec $command
 		fi
 
+		command=""
 	done
 done

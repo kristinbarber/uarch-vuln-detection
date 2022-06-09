@@ -9,7 +9,7 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 Run <code>make</code> in <code>apps/bearssl-0.6/microsampler_tests</code> to compile all the tests.
 
-The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes using SSH of the same application, selecting different inputs (keys) and hardware designs. This script is simply a helper-wrapper which then executes <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code> followed by <code>parser.py</code> and <code>stats.py</code>, respectively.
+The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes using SSH of the same application, selecting different inputs (keys) and hardware designs. This script is simply a helper-wrapper which then executes <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code> followed by <code>parse_trace.py</code> and <code>stats.py</code>, respectively.
 The script should be called three times to launch the simulation, parsing and stats collection phases. Below are some examples of its use:  
 > <code>./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v2 -design baseline -mode ssh</code>    
 
@@ -28,7 +28,7 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 1. Set <code>SIM_ROOT</code> environment variable to point to the root directory of this repository
 2. Set USER and PASSWD fields in launcher script
 3. Launch runs with the procedure outlined above. Select suite, design, application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  The statistics reporting done corresponds to the analysis described in our Computer Architecture Letters publication, [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications].
-4. To create CSV files of uarch trace data to be fed as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Tables for each application,keys will be generated from this pair. An example:
+4. To create CSV files of uarch trace data as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Columnar tables for each application,keys will be generated from this pair. The file will be placed under the <code>data</code> directory. An example:
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
 
 ### Adding a Test
