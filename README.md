@@ -60,6 +60,7 @@ The first stage is to simulate the processor-under-test, executing the selected 
 5. Checkout branch for the baseline design with Microsampler tracing: <code>git checkout baseline</code>
 6. Change to the <code>sims/verilator</code> directory
     1. Run <code>CONFIG=SmallBoomConfig</code>, this command will generate the simulator executable
+7. Rename simulator binary by adding extension to correspond to design variant used (e.g., SmallBoomConfig-baseline)
 
 ### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
