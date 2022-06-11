@@ -60,7 +60,7 @@ The first stage is to simulate the processor-under-test, executing the selected 
 5. Checkout branch for the baseline design with Microsampler tracing: <code>git checkout baseline</code>
 6. Change to the <code>sims/verilator</code> directory
     1. Run <code>CONFIG=SmallBoomConfig</code>, this command will generate the simulator executable
-7. Rename simulator binary by adding extension to correspond to design variant used (e.g., SmallBoomConfig-baseline)
+7. Rename simulator binary by adding extension corresponding to design variant used (e.g., <code>SmallBoomConfig-baseline</code>)
 
 ### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
@@ -68,10 +68,14 @@ The <code>apps</code> directory holds respositories for tests to be run with the
 We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
-## State Construction
-    
-## Metric Calculation and Statistics Reporting
+## Parsing
+### State Construction
+### Finding Security-Critical Regions    
+
+## Statistics Reporting
 
 ## Software Modules
+1. <code>Microarchitecture.py</code>
+2. <code>Parser.py</code>
 
 [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications]: https://ieeexplore.ieee.org/document/9713708
