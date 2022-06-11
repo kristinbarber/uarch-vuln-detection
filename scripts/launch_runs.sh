@@ -1,5 +1,5 @@
 #SET THESE VARIABLES.
-PASSWD='pleasechangethispasswordasap'
+PASSWD_FILE='passwd_file'
 USER='barberk'
 
 
@@ -94,7 +94,7 @@ if [ "$action" == "kill" ]; then
                 echo "node $node"
                 command="pkill -u "$USER
                 if [ "$mode" == "ssh" ]; then
- 			sshpass -p "$PASSWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
+ 			sshpass -f "$PASSWD_FILE" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo $command
 		fi
@@ -155,7 +155,7 @@ do
 
 		if [ "$mode" == "ssh" ]; then
 			echo "Launching "$design":"$app":"$key" on arch"$node""
-			sshpass -p "$PASSWD" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
+			sshpass -f "$PASSWD_FILE" ssh -o StrictHostKeyChecking=no "$USER"@arch$node.cse.ohio-state.edu "$command"
 		elif [ "$mode" == "dryrun" ]; then
 			echo "Launching "$design":"$app":"$key""
 			echo $command
