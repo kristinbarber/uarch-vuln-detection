@@ -6,7 +6,7 @@ uarch = sys.argv[3]
 suite = sys.argv[4]
 
 #Not all tests print key bits during loop for efficiency, use the report from debug runs
-simout = open('logs/'+uarch+'/bearssl_single/vuln/100/'+keyname+'/stdout.txt', 'r').read() 
+simout = open('logs/'+uarch+'/'+suite+'/'+appname+'/100/'+keyname+'/stdout.txt', 'r').read() 
 loopsUArch, theta_lst, diff, keybin = pickle.load(open('logs/'+uarch+'/'+suite+'/'+appname+'/100/'+keyname+'/sets.pickle', 'rb'))
 
 keybin = ''.join(keybin)
