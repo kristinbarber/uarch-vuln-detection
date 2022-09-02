@@ -32,11 +32,13 @@ Print the command that will be issued to the remote node over SSH, instead of ru
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
 
 ### Adding a Test
+A great resource for learning about cryptographic primitives vulnerable to side-channels is [A Survey of Microarchitectural Side-channel Vulnerabilities, Attacks, and Defenses in Cryptography]. Inspiration for additional tests can be pulled from here. OpenSSL, BearSSL and Bitcoin have more open-sourced crpytographic implementations that can be integrated to analyze. The vulnerability exposed in modular exponentiation is control-flow based, but dataflow-based dependencies are another large class of vulnerability left to future work (think S-box substitutions or T-table accesses in AES).
+
 1. Add an application test by first compiling it with the riscv cross-compiler toolchain (within Chipyard install)
     1. Taking a look at the Makefile under <code>apps/bearssl-0.6/microsampler_tests</code> for examples
-3. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
-4. Make note of program counter values associated with the starting and ending points of these regions
-5. Enter PC values into launcher script under parsing section for each test, these are consulted during state sample creation
+2. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
+3. Make note of program counter values associated with the starting and ending points of these regions
+4. Enter PC values into launcher script under parsing section for each test, these are consulted during state sample creation
     1. There are five PC values which need to be entered: (a) state sample record begin, (b) state sample record end, (c) caller of SCR, (d) SCR callee, (e) SCR return
    
 ### Adding a Key
@@ -79,3 +81,4 @@ The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</cod
 2. <code>Parser.py</code>
 
 [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications]: https://ieeexplore.ieee.org/document/9713708
+[A Survey of Microarchitectural Side-channel Vulnerabilities, Attacks, and Defenses in Cryptography]: https://dl.acm.org/doi/10.1145/3456629
