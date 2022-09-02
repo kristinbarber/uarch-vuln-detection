@@ -12,6 +12,7 @@ Trace recording (state sampling) should only begin after the test is executed th
 # Compile the Test Baremetal
 
 <code> riscv64-unknown-elf-gcc -Os -fno-inline -fno-common -fno-builtin-printf -specs=htif_nano.specs -c ct.c </code>
+
 <code> riscv64-unknown-elf-gcc -Os -static -specs=htif_nano.specs ct.o -o ct_ccopy_bare </code>
 
 ## Debugging
@@ -28,4 +29,5 @@ Trace recording (state sampling) should only begin after the test is executed th
 2. Make edits, then
 
 <code> riscv64-unknown-elf-as ct.S -o ct.o </code>
+
 <code> riscv64-unknown-elf-gcc -Os -static -specs=htif_nano.specs ct.o -o ct_ccopy_bare </code>
