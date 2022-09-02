@@ -34,6 +34,7 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 ### Adding a Test
 A great resource for learning about cryptographic primitives vulnerable to side-channels is [A Survey of Microarchitectural Side-channel Vulnerabilities, Attacks, and Defenses in Cryptography]. Inspiration for additional tests can be pulled from here. OpenSSL, BearSSL and Bitcoin have more open-sourced crpytographic implementations that can be integrated to analyze. The vulnerability exposed in modular exponentiation is control-flow based, but dataflow-based dependencies are another large class of vulnerability left to future work (think S-box substitutions or T-table accesses in AES).
 
+Steps to integrate a new test:
 1. Add an application test by first compiling it with the riscv cross-compiler toolchain (within Chipyard install)
     1. Taking a look at the Makefile under <code>apps/bearssl-0.6/microsampler_tests</code> for examples
 2. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
