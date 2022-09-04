@@ -23,7 +23,7 @@ This will launch a simulation only for the 0xaa input, for three applications (v
 
 Print the command that will be issued to the remote node over SSH, instead of running it
 
-### General Steps
+## General Steps
 
 1. Set <code>SIM_ROOT</code> environment variable to point to the root directory of this repository
 2. Set <code>USER</code> and <code>PASSWD_FILE</code> fields in launcher script. <code>PASSWD_FILE</code> is the name of a plain-text file containing the password to be used by SSH for node login. This should be created/kept in the root directory of this repo.
@@ -93,5 +93,6 @@ In warm-up, trace recording (state sampling) should only begin after the test is
 1. <code>Microarchitecture.py</code>
 2. <code>Parser.py</code>
 
+## Using Machine Learning to Identify Data-Dependent Patterns
 [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications]: https://ieeexplore.ieee.org/document/9713708
 [A Survey of Microarchitectural Side-channel Vulnerabilities, Attacks, and Defenses in Cryptography]: https://dl.acm.org/doi/10.1145/3456629
