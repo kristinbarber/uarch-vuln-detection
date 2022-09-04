@@ -7,9 +7,8 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
-### Dependencies
-
-1. Python3 > 3.8
+**Dependencies**
+1. Requires Python3 > 3.8
 
 Run <code>make</code> in <code>apps/bearssl-0.6/microsampler_tests</code> to compile all the tests.
 
