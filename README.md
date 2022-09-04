@@ -71,7 +71,13 @@ The <code>apps</code> directory holds respositories for tests to be run with the
 We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
-The applications included are those from the CAL publication. A historically leaky version of modular exponentiation, the same primitive with an incomplete fix and what is currently considered a robust implementation against timing side-channels. We hope to expand this test set over time.
+The applications included are those from the CAL publication. 
+
+1. [**v1**] A historically leaky version of modular exponentiation
+2. [**v2**] the same primitive with an incomplete fix 
+3. [**v3**] what is currently considered a robust implementation against timing side-channels. 
+
+We hope to expand this test set over time.
 
 Each test will have multiple versions. Each version helps to analyze how different microarchitectural effects impact leakage behavior. For instance, there is a version with a warm-up phase to prime the caches, etc. Warm-up is simply achieved by executing the test twice in a row. There is also a version that flushes the pipeline before each round/iteration of the algorithm.
 
