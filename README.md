@@ -71,6 +71,13 @@ The <code>apps</code> directory holds respositories for tests to be run with the
 We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
+The applications included are those from the CAL publication. A historically leaky version of modular exponentiation, the same primitive with an incomplete fix and what is currently considered a robust implementation against timing side-channels. We hope to expand this test set over time.
+
+Each test will have multiple versions. Each version helps to analyze how different microarchitectural effects impact leakage behavior. For instance, there is a version with a warm-up phase to prime the caches, etc. Warm-up is achieved by executing the test twice (calling the function performing the loop), back-to-back. There is also a verion that flushes the pipeline before each round/iteration of the algorithm.
+
+In warm-up, trace recording (state sampling) should only begin after the test is executed the second time. This is done by including a marker to indicate the second test has started. The marker is a specific instruction encoding a
+nd the instruction is added into the test explicitly using in-line assembly (__asm__ directives). The encoding is 00008013 (the addi x0, x1, 0 instruction in RISC-V). The PC for this marker instruction would be used as the "state sample record begin" parameter for parsing. 
+
 ## Parsing
 ### State Construction
 ### Finding Security-Critical Regions    

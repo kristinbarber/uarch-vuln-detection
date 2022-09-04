@@ -4,10 +4,6 @@ With baremetal we don't have a way to pass input (keys). The key value needs to 
 This is essentially running in M-mode with no kernel or runtime env.
 
 The ct_ccopy test includes the constant-time copy primitive from BearSSL and calls it in a loop. Doing so mimics the way it would be used in the basic square-and-multiply algorithm.
-This test also includes a warm-up phase to prime the caches, etc. Warm-up is achieved by executing the test twice (calling the function performing the loop), back-to-back. 
-
-Trace recording (state sampling) should only begin after the test is executed the second time. This is done by including a marker to indicate the second test has started. The marker is a specific instruction encoding and the instruction is added into the test explicitly using in-line assembly (__asm__ directives). The encoding is 00008013 (the addi x0, x1, 0 instruction in RISC-V).
-
 
 # Compile the Test Baremetal
 
