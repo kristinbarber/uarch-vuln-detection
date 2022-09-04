@@ -93,7 +93,9 @@ In warm-up, trace recording (state sampling) should only begin after the test is
 1. <code>Microarchitecture.py</code>
 2. <code>Parser.py</code>
 
-## Towards Automated Discovery: Machine Learning to Identify Data-Dependent Patterns
+## Towards Automated Discovery
+
+### Machine Learning to Identify Data-Dependent Patterns
 
 
 [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications]: https://ieeexplore.ieee.org/document/9713708
