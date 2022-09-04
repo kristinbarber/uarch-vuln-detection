@@ -7,6 +7,10 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
+### Dependencies
+
+1. Python3 > 3.8
+
 Run <code>make</code> in <code>apps/bearssl-0.6/microsampler_tests</code> to compile all the tests.
 
 The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes using SSH of the same application, selecting different inputs (keys) and hardware designs. This script is simply a helper-wrapper which then executes <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code> followed by <code>parse_trace.py</code> and <code>stats.py</code>, respectively.
