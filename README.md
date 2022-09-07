@@ -7,6 +7,9 @@ The tool has three stages: simulation, parsing and calculation of vulnerability 
 
 ## Quick Start
 
+**Dependencies**
+1. Requires Python3 > 3.8 (suggest using <code>conda</code> to install local version)
+
 Run <code>make</code> in <code>apps/bearssl-0.6/microsampler_tests</code> to compile all the tests.
 
 The file <code>scripts/launch_runs.sh</code> is a job scheduling script for a local cluster. This can be used to launch multiple runs across nodes using SSH of the same application, selecting different inputs (keys) and hardware designs. This script is simply a helper-wrapper which then executes <code>do_simulation.sh</code>, <code>do_parse.sh</code> and <code>do_stats.sh</code> followed by <code>parse_trace.py</code> and <code>stats.py</code>, respectively.
@@ -23,7 +26,7 @@ This will launch a simulation only for the 0xaa input, for three applications (v
 
 Print the command that will be issued to the remote node over SSH, instead of running it
 
-### General Steps
+## General Steps
 
 1. Set <code>SIM_ROOT</code> environment variable to point to the root directory of this repository
 2. Set <code>USER</code> and <code>PASSWD_FILE</code> fields in launcher script. <code>PASSWD_FILE</code> is the name of a plain-text file containing the password to be used by SSH for node login. This should be created/kept in the root directory of this repo.
@@ -32,11 +35,14 @@ Print the command that will be issued to the remote node over SSH, instead of ru
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
 
 ### Adding a Test
+A great resource for learning about cryptographic primitives vulnerable to side-channels is [A Survey of Microarchitectural Side-channel Vulnerabilities, Attacks, and Defenses in Cryptography]. Inspiration for additional tests can be pulled from here. OpenSSL, BearSSL and Bitcoin have more open-sourced crpytographic implementations that can be integrated to analyze. The vulnerability exposed in modular exponentiation is control-flow based, but dataflow-based dependencies are another large class of vulnerability left to future work (think S-box substitutions or T-table accesses in AES).
+
+Steps to integrate a new test:
 1. Add an application test by first compiling it with the riscv cross-compiler toolchain (within Chipyard install)
     1. Taking a look at the Makefile under <code>apps/bearssl-0.6/microsampler_tests</code> for examples
-3. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
-4. Make note of program counter values associated with the starting and ending points of these regions
-5. Enter PC values into launcher script under parsing section for each test, these are consulted during state sample creation
+2. Using <code>objdump</code>, inspect the disassembly to identify security-critical regions of interest
+3. Make note of program counter values associated with the starting and ending points of these regions
+4. Enter PC values into launcher script under parsing section for each test, these are consulted during state sample creation
     1. There are five PC values which need to be entered: (a) state sample record begin, (b) state sample record end, (c) caller of SCR, (d) SCR callee, (e) SCR return
    
 ### Adding a Key
@@ -68,6 +74,18 @@ The <code>apps</code> directory holds respositories for tests to be run with the
 We have created several unit tests based on the BearSSL library primitives that are intended to (1) ease use with the simulation platform, (2) exercise known vulnerabilities and (3) test the robustness of software mitigation techniques.
 The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</code> and can all be compiled using the provided Makefile. These tests take as input the secret key represented as a hexidecimal value and should be equal to the expected number of bytes (bits) for the cipher selected (e.g., 1024-bit for RSA (modpow)).
 
+The applications included are those from the CAL publication. 
+
+1. [**v1**] A historically leaky version of modular exponentiation
+2. [**v2**] the same primitive with an incomplete fix 
+3. [**v3**] what is currently considered a robust implementation against timing side-channels. 
+
+We hope to expand this test set over time.
+
+Each test will have multiple versions. Each version helps to analyze how different microarchitectural effects impact leakage behavior. For instance, there is a version with a warm-up phase to prime the caches, etc. Warm-up is simply achieved by executing the test twice in a row. There is also a version that flushes the pipeline before each round/iteration of the algorithm.
+
+In warm-up, trace recording (state sampling) should only begin after the test is executed the second time. This is done by including a marker to indicate the second test has started. The marker is a specific instruction encoding and the instruction is added into the test explicitly using in-line assembly (__asm__ directives). The encoding is 00008013 (the addi x0, x1, 0 instruction in RISC-V). The PC for this marker instruction would be used as the "state sample record begin" parameter for parsing. 
+
 ## Parsing
 ### State Construction
 ### Finding Security-Critical Regions    
@@ -78,4 +96,10 @@ The unit tests can be found under <code>apps/bearssl-0.6/microsampler_tests</cod
 1. <code>Microarchitecture.py</code>
 2. <code>Parser.py</code>
 
+## Towards Automated Discovery
+
+### Machine Learning to Identify Data-Dependent Patterns
+
+
 [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications]: https://ieeexplore.ieee.org/document/9713708
+[A Survey of Microarchitectural Side-channel Vulnerabilities, Attacks, and Defenses in Cryptography]: https://dl.acm.org/doi/10.1145/3456629
