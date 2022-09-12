@@ -127,7 +127,9 @@ do
 		
 		elif [ "$action" == "parse" ]; then
 			command+="nohup ./scripts/do_parse.sh "$key 
-                	if [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1" ]; then
+			if [ "$suite" == "microbench" ] && [ "$app" == "ct_ccopy" ]; then
+				command+=" 0x008000010e 0x0080000124 0x0080000196 0x0080000130 0x008000019a "
+                	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1" ]; then
 				command+=" 0x0000010128 0x000001012c 0x00000106d2 0x000001022c 0x00000106d6 "
                 	elif [ "$suite" == "bearssl_synthetic" ] && [ "$app" == "v1_warmup" ]; then
 				command+=" 0x000001014a 0x000001014e 0x00000106f4 0x000001024e 0x00000106f8 "

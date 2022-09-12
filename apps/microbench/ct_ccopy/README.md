@@ -9,21 +9,23 @@ The ct_ccopy test includes the constant-time copy primitive from BearSSL and cal
 
 <code> riscv64-unknown-elf-gcc -Os -fno-inline -fno-common -fno-builtin-printf -specs=htif_nano.specs -c ct.c </code>
 
-<code> riscv64-unknown-elf-gcc -Os -static -specs=htif_nano.specs ct.o -o ct_ccopy_bare </code>
+<code> riscv64-unknown-elf-gcc -Os -static -specs=htif_nano.specs ct.o -o ct_ccopy </code>
 
 ## Debugging
 
-<code> riscv64-unknown-elf-objdump --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data ct_ccopy_bare > ct_ccopy_bare.dump </code>
+<code> riscv64-unknown-elf-objdump --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data ct_ccopy > ct_ccopy.dump </code>
 
 
-## Adding Assembly Instructions
+## Adding <code> nop </code> for Fine-Tuned Delays
 
-1. Run the assembler, edit the assembly (.S) file directly to insert desired instructions for flushing, etc.
+1. Run the compiler, generate assembly file
 
 <code> riscv64-unknown-elf-gcc -Os -fno-inline -fno-common -fno-builtin-printf -specs=htif_nano.specs -S -o ct.S ct.c </code>
 
-2. Make edits, then
+2. Edit the assembly (.S) file directly to insert nops (pipe bubbles, delays that compiler may remove), then call assembler to generate object code 
 
 <code> riscv64-unknown-elf-as ct.S -o ct.o </code>
 
-<code> riscv64-unknown-elf-gcc -Os -static -specs=htif_nano.specs ct.o -o ct_ccopy_bare </code>
+3. Compile binary using object file from previous step
+
+<code> riscv64-unknown-elf-gcc -Os -static -specs=htif_nano.specs ct.o -o ct_ccopy </code>
