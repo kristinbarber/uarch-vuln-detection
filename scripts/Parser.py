@@ -236,13 +236,13 @@ def get_trace_data(fin, begin_roi_pc, end_roi_pc):
         
             if statusType == 'Req':
                 if funcUnitType == 'ALU':
-                   curCycle.executionUnits.exeReqs[FunctionalUnits.ALU] = pc 
+                   curCycle.executionUnits.exeReqs[FunctionalUnits.ALU].append(pc) 
                 elif funcUnitType == 'AddrCalc':
-                   curCycle.executionUnits.exeReqs[FunctionalUnits.ADDRGEN] = pc
+                   curCycle.executionUnits.exeReqs[FunctionalUnits.ADDRGEN].append(pc)
                 elif funcUnitType == 'Mul':
-                   curCycle.executionUnits.exeReqs[FunctionalUnits.MUL] = pc
+                   curCycle.executionUnits.exeReqs[FunctionalUnits.MUL].append(pc)
                 elif funcUnitType == 'Div':
-                   curCycle.executionUnits.exeReqs[FunctionalUnits.DIV] = pc
+                   curCycle.executionUnits.exeReqs[FunctionalUnits.DIV].append(pc)
 
         elif (match := re.search(dtlbStatus, line)):
             pc = match.group(1)

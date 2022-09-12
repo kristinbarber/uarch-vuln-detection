@@ -63,11 +63,11 @@ class CircularQueue:
 
 class ExecutionUnits:
     def __init__(self):
-        self.exeReqs = {FunctionalUnits.ALU: '', FunctionalUnits.ADDRGEN: '', FunctionalUnits.MUL: '', FunctionalUnits.DIV: ''}
+        self.exeReqs = {FunctionalUnits.ALU: [], FunctionalUnits.ADDRGEN: [], FunctionalUnits.MUL: [], FunctionalUnits.DIV: []}
 
     def __eq__(self, exeOther):
         for k in self.exeReqs:
-            if self.exeReqs[k] != exeOther.exeReqs[k]:
+            if not compareContent(self.exeReqs[k], exeOther.exeReqs[k]):
                 return False
         return True
 
