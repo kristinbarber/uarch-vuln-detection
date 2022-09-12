@@ -8,7 +8,10 @@ diff_regex = re.compile('logs/'+sys.argv[3]+'/'+sys.argv[2]+'/([0-9a-z_]+)/100/(
 
 blob = os.popen('ls logs/'+sys.argv[3]+'/'+sys.argv[2]+'/'+sys.argv[1]+'/100/*/sets.pickle')
 traces = blob.readlines()
-table = open('data/table-'+sys.argv[1]+'.csv', 'w+')
+
+if not os.path.exists('data/'+sys.argv[3]):
+    os.makedirs('data/'+sys.argv[3])
+table = open('data/'+sys.argv[3]+'/table-'+sys.argv[1]+'.csv', 'w')
 iters = 100
 
 diffs = {}
