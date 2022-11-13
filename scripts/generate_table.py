@@ -45,7 +45,9 @@ for x in range(32):
 for x in range(16):
     header += 'LFB-'+str(x)+','
 for x in FunctionalUnits:
-    header += 'EUU-'+str(x.name)+','
+    if x.name == 'ALU': 
+        header += 'EUU-'+str(x.name)+'-0,'
+        header += 'EUU-'+str(x.name)+'-1,'
 header += 'PREF-ADDR,CLASS,ITER,KEY,DTLB-NMISS,DCACHE-NMISS'
 
 row = ''
@@ -82,7 +84,9 @@ for keystr in testnames:
                 except: row += ',' 
             row = row[:-1] + ','
             for x in FunctionalUnits:
-                try: row += str(state.executionUnits.exeReqs[x]) + ',' #one instruction in any unit in a cycle for SmallBoomConfig
+                try: row += str(state.executionUnits.exeReqs[x][0]) + ',' #one instruction in any unit in a cycle for SmallBoomConfig
+                if x.name == 'ALU':
+                    try: row += str(state.executionUnits.exeReqs[x][1]) + ',' #two ALU units/instructions in a cycle for SmallBoomConfig with fast-bypass
                 except: row += ','
             row = row[:-1] + ','
             row += hex(state.hwprefetcher.address) + ',' 

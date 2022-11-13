@@ -14,6 +14,8 @@ conda activate microsampler
 ### Example: ./scripts/launch_runs.sh -action simulate -suite bearssl_synthetic -appsi v1 -design fast-bypass -mode dryrun  ###
 
 
+cd $SIM_ROOT
+
 ### v1, 0xaa ###
 mkdir -p logs/fast-bypass/bearssl_synthetic/v1/100/0xaa; ./scripts/do_simulation.sh 0xaa bearssl_synthetic v1 100 fast-bypass > logs/fast-bypass/bearssl_synthetic/v1/100/0xaa/launch_simulation.log
 
